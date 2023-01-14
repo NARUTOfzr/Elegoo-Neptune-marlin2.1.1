@@ -1503,13 +1503,12 @@
 
   #define EVENT_GCODE_SD_ABORT "G28XY"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
 
-
   #if NEPTUNE_3_PRO
     #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y235"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
   #elif NEPTUNE_3_PLUS
-    #define EVENT_GCODE_SD_ABORT_2 "G1 X0 Y330"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
+    #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y330"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
   #elif NEPTUNE_3_MAX
-    #define EVENT_GCODE_SD_ABORT_2 "G1 X0 Y430"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
+    #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y430"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
   #endif
 
   #if ENABLED(PRINTER_EVENT_LEDS)
@@ -1539,7 +1538,7 @@
 
     // Without a POWER_LOSS_PIN the following option helps reduce wear on the SD card,
     // especially with "vase mode" printing. Set too high and vases cannot be continued.
-    #define POWER_LOSS_MIN_Z_CHANGE 0.05 // (mm) Minimum Z change before saving power-loss data
+    #define POWER_LOSS_MIN_Z_CHANGE 0.08 // (mm) Minimum Z change before saving power-loss data
 
     // Enable if Z homing is needed for proper recovery. 99.9% of the time this should be disabled!
     //#define POWER_LOSS_RECOVER_ZHOME

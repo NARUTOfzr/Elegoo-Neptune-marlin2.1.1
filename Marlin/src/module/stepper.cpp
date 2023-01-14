@@ -2243,7 +2243,7 @@ uint32_t Stepper::block_phase_isr() {
 
       #if ENABLED(POWER_LOSS_RECOVERY)
         recovery.info.sdpos = current_block->sdpos;
-        recovery.info.current_position = current_block->start_position;
+        //recovery.info.current_position = current_block->start_position;
       #endif
 
       #if ENABLED(DIRECT_STEPPING)

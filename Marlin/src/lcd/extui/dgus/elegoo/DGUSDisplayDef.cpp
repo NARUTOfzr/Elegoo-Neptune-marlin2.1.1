@@ -1666,7 +1666,7 @@
 
             //Z轴高度
             memset(temp,0,sizeof(temp));
-            sprintf(temp, "main.zvalue.val=%d", (int)(100 * current_position[Z_AXIS]));
+            sprintf(temp, "main.zvalue.val=%d", (int)(1000 * current_position[Z_AXIS]));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");
 
@@ -5268,18 +5268,6 @@
           sprintf(temp, "printpause.printspeed.txt=\"%d\"", feedrate_percentage );
           LCD_SERIAL_2.printf(temp);
           LCD_SERIAL_2.printf("\xff\xff\xff"); 
-
-          //fanspeed         
-          memset(temp,0,sizeof(temp));
-          sprintf(temp, "printpause.fanspeed.txt=\"%d\"", thermalManager.fan_speed[0] );
-          LCD_SERIAL_2.printf(temp);
-          LCD_SERIAL_2.printf("\xff\xff\xff");  
-
-          //zvalue   
-          memset(temp,0,sizeof(temp));
-          sprintf(temp, "printpause.zvalue.val=%d", (int)(100 * current_position[Z_AXIS]));
-          LCD_SERIAL_2.printf(temp);
-          LCD_SERIAL_2.printf("\xff\xff\xff");
 
           //printtime
           #if ENABLED(RTS_AVAILABLE) 

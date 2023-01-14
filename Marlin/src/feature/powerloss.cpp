@@ -172,7 +172,7 @@ void PrintJobRecovery::save(const bool force/*=false*/, const float zraise/*=POW
 
   // Did Z change since the last call?
   #if ENABLED(RTS_AVAILABLE) 
-  if(current_position.z > planner.z_fade_height)
+  //if(current_position.z > planner.z_fade_height)
   #endif
   {
     if (force
@@ -180,8 +180,14 @@ void PrintJobRecovery::save(const bool force/*=false*/, const float zraise/*=POW
         #if SAVE_INFO_INTERVAL_MS > 0       // Save if interval is elapsed
           || ELAPSED(ms, next_save_ms)
         #endif
+      // Save if Z is above the last-saved position by some minimum height
+      //|| current_position.z > info.current_position.z + POWER_LOSS_MIN_Z_CHANGE
+        #if ENABLED(RTS_AVAILABLE)
+          || (current_position[Z_AXIS] > (info.current_position.z + POWER_LOSS_MIN_Z_CHANGE))
+        #else
         // Save if Z is above the last-saved position by some minimum height
-        || current_position.z > (info.current_position.z + POWER_LOSS_MIN_Z_CHANGE)
+          || (current_position.z > (info.current_position.z + POWER_LOSS_MIN_Z_CHANGE))
+        #endif
       #endif
     ) {
 
@@ -196,6 +202,7 @@ void PrintJobRecovery::save(const bool force/*=false*/, const float zraise/*=POW
 
       // Machine state
       // info.sdpos and info.current_position are pre-filled from the Stepper ISR
+      info.current_position = current_position;
 
       info.feedrate = uint16_t(MMS_TO_MMM(feedrate_mm_s));
       info.zraise = zraise;
@@ -248,6 +255,8 @@ void PrintJobRecovery::save(const bool force/*=false*/, const float zraise/*=POW
       info.flag.allow_cold_extrusion = TERN0(PREVENT_COLD_EXTRUSION, thermalManager.allow_cold_extrude);
 
       write();
+
+      //info.current_position.z = (current_position[Z_AXIS] + 0.2);
     }
   }
   //set_bed_leveling_enabled(true);
