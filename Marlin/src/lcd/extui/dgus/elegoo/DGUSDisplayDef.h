@@ -205,7 +205,8 @@
   extern uint8_t showcount;
   extern bool abortSD_flag;
   extern bool RTS_M600_Flag;
-  extern bool Home_stop_flag; 
+  extern bool Home_stop_flag;
+  extern bool Move_finish_flag; 
 
   #define PIC_TXT_GOCDE     
 
@@ -379,8 +380,16 @@
   void EachMomentUpdate();
 
   #define MACVERSION              STRING_CONFIG_H_AUTHOR
-  #define SOFTVERSION             "1.1.5.1"
+  
   #define CORP_WEBSITE            "www.elegoo.com"
+
+  #if NEPTUNE_3_PRO
+    #define SOFTVERSION             "1.1.5.2"
+  #elif NEPTUNE_3_PLUS
+    #define SOFTVERSION             "1.2.5.2"
+  #elif NEPTUNE_3_MAX
+    #define SOFTVERSION             "1.3.5.2"
+  #endif
 
   #if ENABLED(SDSUPPORT)
     #include "../../../../sd/SdFile.h"

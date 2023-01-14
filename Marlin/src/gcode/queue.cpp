@@ -437,6 +437,10 @@ void GCodeQueue::get_serial_commands() {
       // Ok, we have some data to process, let's make progress here
       hadData = true;
 
+      #if ENABLED(RTS_AVAILABLE)
+        Move_finish_flag = true;
+      #endif
+
       const int c = read_serial(p);
       if (c < 0) {
         // This should never happen, let's log it
@@ -603,35 +607,6 @@ void GCodeQueue::get_serial_commands() {
       }
       else
         process_stream_char(sd_char, sd_input_state, command.buffer, sd_count);
-
-      #if ENABLED(RTS_AVAILABLE)
-        // the printing results
-        if (card_eof)
-        {
-          abortSD_flag = false;
-          rtscheck.RTS_SndData(100, PRINT_PROCESS_VP);
-          delay(1);
-          rtscheck.RTS_SndData(100, PRINT_PROCESS_ICON_VP);
-          delay(1);
-          rtscheck.RTS_SndData(0, PRINT_SURPLUS_TIME_HOUR_VP);
-          delay(1);
-          rtscheck.RTS_SndData(0, PRINT_SURPLUS_TIME_MIN_VP);
-          delay(1);
-
-          rtscheck.RTS_SndData(ExchangePageBase + 9, ExchangepageAddr);
-          
-          #if ENABLED(TJC_AVAILABLE) 
-            LCD_SERIAL_2.printf("page printfinish");
-            LCD_SERIAL_2.printf("\xff\xff\xff");
-
-            planner.synchronize();
-            queue.enqueue_now_P(PSTR("M84"));
-            
-            card.endFilePrintNow();
-            card.flag.sdprinting = false;     
-          #endif
-        }
-      #endif
     }
   }
 

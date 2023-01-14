@@ -57,6 +57,10 @@
   #include "../../feature/host_actions.h"
 #endif
 
+#if ENABLED(RTS_AVAILABLE)
+  #include "../../lcd/extui/dgus/elegoo/DGUSDisplayDef.h"
+#endif
+
 #ifndef PE_LEDS_COMPLETED_TIME
   #define PE_LEDS_COMPLETED_TIME (30*60)
 #endif
@@ -112,6 +116,29 @@ void GcodeSuite::M1001() {
 
   TERN_(EXTENSIBLE_UI, ExtUI::onPrintDone());
   TERN_(DWIN_LCD_PROUI, DWIN_Print_Finished());
+
+  #if ENABLED(RTS_AVAILABLE)
+
+    abortSD_flag = false;
+
+    rtscheck.RTS_SndData(100, PRINT_PROCESS_VP);
+    delay(1);
+    rtscheck.RTS_SndData(100, PRINT_PROCESS_ICON_VP);
+    delay(1);
+    rtscheck.RTS_SndData(0, PRINT_SURPLUS_TIME_HOUR_VP);
+    delay(1);
+    rtscheck.RTS_SndData(0, PRINT_SURPLUS_TIME_MIN_VP);
+    delay(1);
+
+    rtscheck.RTS_SndData(ExchangePageBase + 9, ExchangepageAddr);
+    
+    #if ENABLED(TJC_AVAILABLE) 
+      LCD_SERIAL_2.printf("page printfinish");
+      LCD_SERIAL_2.printf("\xff\xff\xff");
+      queue.enqueue_now_P(PSTR("M84")); 
+    #endif
+    
+  #endif  
 
   // Re-select the last printed file in the UI
   TERN_(SD_REPRINT_LAST_SELECTED_FILE, ui.reselect_last_file());

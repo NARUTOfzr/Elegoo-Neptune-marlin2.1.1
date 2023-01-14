@@ -115,7 +115,7 @@ void MKS_resume_print_move() {
   prepare_internal_move_to_destination(park_speed_z);
 
   #if ENABLED(RTS_AVAILABLE)
-    destination.e = (current_position.e + 10);
+    destination.e = (current_position.e + 5);
     prepare_internal_move_to_destination(park_speed_e);  
   #endif
 

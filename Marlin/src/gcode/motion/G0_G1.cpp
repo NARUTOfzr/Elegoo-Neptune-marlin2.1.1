@@ -78,7 +78,12 @@ void GcodeSuite::G0_G1(TERN_(HAS_FAST_MOVES, const bool fast_move/*=false*/)) {
       #endif
     #endif
 
-    get_destination_from_command();                 // Get X Y [Z[I[J[K]]]] [E] F (and set cutter power)
+    #if ENABLED(RTS_AVAILABLE)
+    if(Move_finish_flag)
+    #endif
+    {
+      get_destination_from_command();                 // Get X Y [Z[I[J[K]]]] [E] F (and set cutter power)
+    }
 
     #ifdef G0_FEEDRATE
       if (fast_move) {

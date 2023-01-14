@@ -172,7 +172,7 @@ void PrintJobRecovery::save(const bool force/*=false*/, const float zraise/*=POW
 
   // Did Z change since the last call?
   #if ENABLED(RTS_AVAILABLE) 
-  if(current_position.z > DEFAULT_LEVELING_FADE_HEIGHT)
+  if(current_position.z > planner.z_fade_height)
   #endif
   {
     if (force

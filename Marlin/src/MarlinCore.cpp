@@ -1624,12 +1624,6 @@ void setup() {
     SETUP_RUN(DWIN_InitScreen());
   #endif
 
-  #if ENABLED(RTS_AVAILABLE)
-    #if ENABLED(POWER_LOSS_RECOVERY)
-      recovery.check();
-    #endif
-  #endif
-
   #if HAS_SERVICE_INTERVALS && !HAS_DWIN_E3V2_BASIC
     SETUP_RUN(ui.reset_status(true));  // Show service messages or keep current status
   #endif

@@ -185,6 +185,8 @@
   bool RTS_M600_Flag  = false;
   bool Home_stop_flag = false;
 
+  bool Move_finish_flag = true;
+
   void RTS_reset_settings(void) 
   {
     pla_extrusion_temp = PREHEAT_1_TEMP_HOTEND;
@@ -543,12 +545,12 @@
     }
     else
     {
-      if(sd_printing_autopause == true)
-      {
-        RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
-        card.mount();
-      }
-      else
+      // if(sd_printing_autopause == true)
+      // {
+      //   RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
+      //   card.mount();
+      // }
+      // else
       {
         // clean filename Icon
         for(int j = 0;j < MaxFileNumber;j ++)
@@ -556,21 +558,19 @@
           // clean filename Icon
           for(int i = 0;i < TEXTBYTELEN;i ++)
           {
-            RTS_SndData(0, CardRecbuf.addr[j] + i);
+            #if ENABLED(RTS_AVAILABLE)
+              RTS_SndData(0, CardRecbuf.addr[j] + i);
+            #endif
           }
 
           //清除文件 
           #if ENABLED(TJC_AVAILABLE)
             memset(tmpfilename,0,sizeof(tmpfilename));
             uint8_t page_num = ((j / 5) + 1);
-            char filename[128]; 
-            memset(filename,0,sizeof(filename));
-            //sprintf(tmpfilename, "file%d.t%d.txt=\"\"", page_num, j); 
-            //LCD_SERIAL_2.printf(tmpfilename);
-            //LCD_SERIAL_2.printf("\xff\xff\xff"); 
-            sprintf(filename, "file%d.t%d.txt=\"%s\"", page_num, j, tmpfilename); 
-            LCD_SERIAL_2.printf(filename);
-            LCD_SERIAL_2.printf("\xff\xff\xff");  
+            sprintf(tmpfilename, "file%d.t%d.txt=\"\"", page_num, j); 
+            LCD_SERIAL_2.printf(tmpfilename);
+            LCD_SERIAL_2.printf("\xff\xff\xff");
+            delay(10); 
           #endif
         }
         memset(&CardRecbuf, 0, sizeof(CardRecbuf));
@@ -694,40 +694,44 @@
       {
         card.release();
         
-        if(sd_printing_autopause == true)
+        // if(sd_printing_autopause == true)
+        // {
+        //   RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
+        // }
+        // else
         {
-          RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
-        }
-        else
-        {
-          for(int i = 0;i < CardRecbuf.Filesum;i ++)
-          {
-            for(int j = 0;j < 20;j ++)
+          #if ENABLED(RTS_AVAILABLE)
+            for(int i = 0;i < CardRecbuf.Filesum;i ++)
             {
-              RTS_SndData(0, CardRecbuf.addr[i] + j);
+              for(int j = 0;j < MaxFileNumber;j ++)
+              {
+                RTS_SndData(0, CardRecbuf.addr[i] + j);
+              }
+              RTS_SndData((unsigned long)0xA514, FilenameNature + (i + 1) * 16);
             }
-            RTS_SndData((unsigned long)0xA514, FilenameNature + (i + 1) * 16);
-          }
+          #endif
 
-          for(int j = 0; j < MaxFileNumber; j++)
-          {
-            //清除文件
-            #if ENABLED(TJC_AVAILABLE)
-              char tmpfilename[128];
+          #if ENABLED(TJC_AVAILABLE)
+            for(int j = 0; j < MaxFileNumber; j++)
+            {
+              //清除文件       
+              char tmpfilename[32];
               memset(tmpfilename,0,sizeof(tmpfilename));
               uint8_t page_num = ((j / 5) + 1);
               sprintf(tmpfilename, "file%d.t%d.txt=\"\"", page_num, j); 
               LCD_SERIAL_2.printf(tmpfilename);
-              LCD_SERIAL_2.printf("\xff\xff\xff");
-            #endif  
-          }
+              LCD_SERIAL_2.printf("\xff\xff\xff"); 
+            }
+          #endif
 
-          for(int j = 0;j < 20;j ++)
-          {
-            // clean screen.
-            RTS_SndData(0, PRINT_FILE_TEXT_VP + j);
-            RTS_SndData(0, SELECT_FILE_TEXT_VP + j);
-          }
+          #if ENABLED(RTS_AVAILABLE)
+            for(int j = 0;j < 20;j ++)
+            {
+              // clean screen.
+              RTS_SndData(0, PRINT_FILE_TEXT_VP + j);
+              RTS_SndData(0, SELECT_FILE_TEXT_VP + j);
+            }
+          #endif
 
           memset(&CardRecbuf, 0, sizeof(CardRecbuf));
         }
@@ -743,6 +747,14 @@
         delay(1);
         RTS_SndData(CardRecbuf.Cardshowfilename[i], CardRecbuf.addr[i]);
         RTS_SndData((unsigned long)0xA514, FilenameNature + (i + 1) * 16);
+        delay(1);
+        #if ENABLED(TJC_AVAILABLE)
+          uint8_t page_num = ((i / 5) + 1);
+          char filename[128]={0}; 
+          sprintf(filename, "file%d.t%d.txt=\"%s\"", page_num, i, CardRecbuf.Cardshowfilename[i]); 
+          LCD_SERIAL_2.printf(filename);
+          LCD_SERIAL_2.printf("\xff\xff\xff");         
+        #endif
       }
       CardUpdate = false;
     }
@@ -1639,43 +1651,67 @@
             sprintf(temp, "main.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");
+
+            //X轴坐标
+            memset(temp,0,sizeof(temp));
+            sprintf(temp, "main.xvalue.val=%d", (int)(100 * current_position[X_AXIS]));
+            LCD_SERIAL_2.printf(temp);
+            LCD_SERIAL_2.printf("\xff\xff\xff");  
+
+            //Y轴坐标
+            memset(temp,0,sizeof(temp));
+            sprintf(temp, "main.yvalue.val=%d", (int)(100 * current_position[Y_AXIS]));
+            LCD_SERIAL_2.printf(temp);
+            LCD_SERIAL_2.printf("\xff\xff\xff");  
+
+            //Z轴高度
+            memset(temp,0,sizeof(temp));
+            sprintf(temp, "main.zvalue.val=%d", (int)(100 * current_position[Z_AXIS]));
+            LCD_SERIAL_2.printf(temp);
+            LCD_SERIAL_2.printf("\xff\xff\xff");
+
+            //风扇速度         
+            memset(temp,0,sizeof(temp));
+            sprintf(temp, "main.fanspeed.txt=\"%d\"", thermalManager.fan_speed[0]);
+            LCD_SERIAL_2.printf(temp);
+            LCD_SERIAL_2.printf("\xff\xff\xff");              
           #endif
 
         #endif
 
         #if ENABLED(SDSUPPORT)
-          if((sd_printing_autopause == true) && (PoweroffContinue == true))
-          {
-            if(true == sdcard_pause_check)
-            {
-              if(!CardReader::flag.mounted)
-              {
-                pause_z = current_position[Z_AXIS];
-                pause_e = current_position[E_AXIS] - 3;
-                card.pauseSDPrint();
-                print_job_timer.pause();
-                planner.synchronize();
-                Update_Time_Value = 0;
-                if((1 == active_extruder) && (1 == save_dual_x_carriage_mode))
-                {
-                  queue.enqueue_now_P(PSTR("G1 F3000 X350 Y0"));
-                }
-                else
-                {
-                  queue.enqueue_now_P(PSTR("G1 F3000 X-50 Y0"));
-                }
-                sdcard_pause_check = false;
+          // if((sd_printing_autopause == true) && (PoweroffContinue == true))
+          // {
+          //   if(true == sdcard_pause_check)
+          //   {
+          //     if(!CardReader::flag.mounted)
+          //     {
+          //       pause_z = current_position[Z_AXIS];
+          //       pause_e = current_position[E_AXIS] - 3;
+          //       card.pauseSDPrint();
+          //       print_job_timer.pause();
+          //       planner.synchronize();
+          //       Update_Time_Value = 0;
+          //       if((1 == active_extruder) && (1 == save_dual_x_carriage_mode))
+          //       {
+          //         queue.enqueue_now_P(PSTR("G1 F3000 X350 Y0"));
+          //       }
+          //       else
+          //       {
+          //         queue.enqueue_now_P(PSTR("G1 F3000 X-50 Y0"));
+          //       }
+          //       sdcard_pause_check = false;
 
-                #if ENABLED(RTS_AVAILABLE) 
-                  rtscheck.RTS_SndData(ExchangePageBase + 46, ExchangepageAddr);
-                #endif 
+          //       #if ENABLED(RTS_AVAILABLE) 
+          //         rtscheck.RTS_SndData(ExchangePageBase + 46, ExchangepageAddr);
+          //       #endif 
 
-                #if ENABLED(TJC_AVAILABLE)   
+          //       #if ENABLED(TJC_AVAILABLE)   
 
-                #endif 
-              }
-            }
-          }
+          //       #endif 
+          //     }
+          //   }
+          // }
 
           if((false == sdcard_pause_check) && (false == card.isPrinting()) && !planner.has_blocks_queued())
           {
@@ -2263,6 +2299,7 @@
         if(Addrbuf[i] >= ChangePageKey)
         {
           Checkkey = i;
+          Move_finish_flag = true;
         }
         break;
       }
@@ -2311,6 +2348,9 @@
           queue.clear();
           quickstop_stepper();
           print_job_timer.stop();
+          print_job_timer.reset();
+          sd_printing_autopause = false;
+
           RTS_SndData(0, MOTOR_FREE_ICON_VP);
           RTS_SndData(0, PRINT_PROCESS_ICON_VP);
           RTS_SndData(0, PRINT_PROCESS_VP);
@@ -2319,9 +2359,11 @@
           RTS_SndData(0, PRINT_TIME_MIN_VP);
           RTS_SndData(0, PRINT_SURPLUS_TIME_HOUR_VP);
           RTS_SndData(0, PRINT_SURPLUS_TIME_MIN_VP);
-          print_job_timer.reset();
-          sd_printing_autopause = false;
-          //RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
+          RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
+          
+          #if ENABLED(TJC_AVAILABLE)
+            Move_finish_flag = false;
+          #endif
         }
         else if(recdat.data[0] == 3)
         {
@@ -2392,6 +2434,12 @@
 
             RTS_SndData(ExchangePageBase + 34, ExchangepageAddr);
           #endif
+        }
+        else if(recdat.data[0] == 6)
+        {
+          CardUpdate = true;
+          CardRecbuf.recordcount = -1;
+          RTS_SDCardUpate();            
         }
       }
       break;
@@ -4765,63 +4813,63 @@
         }
         else if (recdat.data[0] == 3)
         {
-          #if ENABLED(TJC_AVAILABLE) 
-            LCD_SERIAL_2.printf("page premove");
-            LCD_SERIAL_2.printf("\xff\xff\xff"); 
+          // #if ENABLED(TJC_AVAILABLE) 
+          //   LCD_SERIAL_2.printf("page premove");
+          //   LCD_SERIAL_2.printf("\xff\xff\xff"); 
 
-            LCD_SERIAL_2.printf("premove.unit_move.val=2"); //默认移动单位1mm
-            LCD_SERIAL_2.printf("\xff\xff\xff"); 
-          #endif
+          //   LCD_SERIAL_2.printf("premove.unit_move.val=2"); //默认移动单位1mm
+          //   LCD_SERIAL_2.printf("\xff\xff\xff"); 
+          // #endif
         
-          if(active_extruder == 0)
-          {
-            RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
-            active_extruder_flag = false;
-          }
-          else if(active_extruder == 1)
-          {
-            RTS_SndData(1, EXCHANGE_NOZZLE_ICON_VP);
-            active_extruder_flag = true;
-          }
+          // if(active_extruder == 0)
+          // {
+          //   RTS_SndData(0, EXCHANGE_NOZZLE_ICON_VP);
+          //   active_extruder_flag = false;
+          // }
+          // else if(active_extruder == 1)
+          // {
+          //   RTS_SndData(1, EXCHANGE_NOZZLE_ICON_VP);
+          //   active_extruder_flag = true;
+          // }
 
-          AxisUnitMode = 1;
+          // AxisUnitMode = 1;
 
-          if(active_extruder == 0)
-          {
-            #if ENABLED(DUAL_X_CARRIAGE)
-              if(TEST(axis_known_position, X_AXIS))
-              {
-                current_position_x0_axis = current_position[X_AXIS];
-              }
-              else
-              {
-                current_position[X_AXIS] = current_position_x0_axis;
-              }
-              RTS_SndData(10 * current_position_x0_axis, AXIS_X_COORD_VP);
-              memset(commandbuf, 0, sizeof(commandbuf));
-              sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x0_axis);
-              queue.enqueue_one_now(commandbuf);
-            #endif
-          }
-          else if(active_extruder == 1)
-          {
-            #if ENABLED(DUAL_X_CARRIAGE)
-              if(TEST(axis_known_position, X_AXIS))
-              {
-                current_position_x1_axis = current_position[X_AXIS];
-              }
-              else
-              {
-                current_position[X_AXIS] = current_position_x1_axis;
-              }
-              RTS_SndData(10 * current_position_x1_axis, AXIS_X_COORD_VP);
-              memset(commandbuf, 0, sizeof(commandbuf));
-              sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x1_axis);
-              queue.enqueue_one_now(commandbuf);
-            #endif
-          }
-          RTS_SndData(10 * current_position[Y_AXIS], AXIS_Y_COORD_VP);
-          RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
+          // if(active_extruder == 0)
+          // {
+          //   #if ENABLED(DUAL_X_CARRIAGE)
+          //     if(TEST(axis_known_position, X_AXIS))
+          //     {
+          //       current_position_x0_axis = current_position[X_AXIS];
+          //     }
+          //     else
+          //     {
+          //       current_position[X_AXIS] = current_position_x0_axis;
+          //     }
+          //     RTS_SndData(10 * current_position_x0_axis, AXIS_X_COORD_VP);
+          //     memset(commandbuf, 0, sizeof(commandbuf));
+          //     sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x0_axis);
+          //     queue.enqueue_one_now(commandbuf);
+          //   #endif
+          // }
+          // else if(active_extruder == 1)
+          // {
+          //   #if ENABLED(DUAL_X_CARRIAGE)
+          //     if(TEST(axis_known_position, X_AXIS))
+          //     {
+          //       current_position_x1_axis = current_position[X_AXIS];
+          //     }
+          //     else
+          //     {
+          //       current_position[X_AXIS] = current_position_x1_axis;
+          //     }
+          //     RTS_SndData(10 * current_position_x1_axis, AXIS_X_COORD_VP);
+          //     memset(commandbuf, 0, sizeof(commandbuf));
+          //     sprintf_P(commandbuf, PSTR("G92.9 X%6.3f"), current_position_x1_axis);
+          //     queue.enqueue_one_now(commandbuf);
+          //   #endif
+          // }
+          // RTS_SndData(10 * current_position[Y_AXIS], AXIS_Y_COORD_VP);
+          // RTS_SndData(10 * current_position[Z_AXIS], AXIS_Z_COORD_VP);
         }
         else if (recdat.data[0] == 4)
         {
@@ -4926,13 +4974,13 @@
         }
         else if(recdat.data[0] == 0x0B)
         {
-          LCD_SERIAL_2.printf("page set");
-          LCD_SERIAL_2.printf("\xff\xff\xff");    
+          // LCD_SERIAL_2.printf("page set");
+          // LCD_SERIAL_2.printf("\xff\xff\xff");    
         }
         else if(recdat.data[0] == 0x0C)
         {
-          LCD_SERIAL_2.printf("page warn_rdlevel");
-          LCD_SERIAL_2.printf("\xff\xff\xff");    
+          // LCD_SERIAL_2.printf("page warn_rdlevel");
+          // LCD_SERIAL_2.printf("\xff\xff\xff");    
         }
         else if(recdat.data[0] == 0x0D)
         {
@@ -5229,7 +5277,7 @@
 
           //zvalue   
           memset(temp,0,sizeof(temp));
-          sprintf(temp, "printpause.zvalue.val=%d", (int)(10 * current_position[Z_AXIS]));
+          sprintf(temp, "printpause.zvalue.val=%d", (int)(100 * current_position[Z_AXIS]));
           LCD_SERIAL_2.printf(temp);
           LCD_SERIAL_2.printf("\xff\xff\xff");
 
@@ -6371,7 +6419,6 @@
       {
         if((recdat.data[0] == 1) && RTS_SD_Detected())
         {
-
           if(thermalManager.wholeDegHotend(0) < 0)
           {
             #if ENABLED(TJC_AVAILABLE)
@@ -7190,24 +7237,13 @@
         else if (recdat.data[0] == 0x0F) 
         {
           const char *MKSTestPath = "MKS_TEST";
-          //const char *TJCUpdate   = "3D30.tft";
           SdFile dir, root = card.getroot();
           if (dir.open(&root, MKSTestPath, O_RDONLY))
           {
             LCD_SERIAL_2.printf("page hardwaretest");
             LCD_SERIAL_2.printf("\xff\xff\xff");
           }
-          // else if(dir.open(&root, TJCUpdate, O_RDONLY))
-          // {
-          //   char tmpfilename[128];
-          //   uint16_t hmi_filesize = dir.fileSize();
-          //   memset(tmpfilename,0,sizeof(tmpfilename));
-          //   sprintf(tmpfilename, "whmi-wri %d,115200,0", hmi_filesize); 
-          //   LCD_SERIAL_2.printf(tmpfilename);
-          //   LCD_SERIAL_2.printf("\xff\xff\xff");
-            
-          // }
-        }                         
+        }                            
       }
       break;
 
