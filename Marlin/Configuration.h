@@ -569,15 +569,15 @@
 #endif
 
 #if HAS_E_TEMP_SENSOR
-  #define TEMP_RESIDENCY_TIME         10  // (seconds) Time to wait for hotend to "settle" in M109
-  #define TEMP_WINDOW                  1  // (°C) Temperature proximity for the "temperature reached" timer
-  #define TEMP_HYSTERESIS              3  // (°C) Temperature proximity considered "close enough" to the target
+  #define TEMP_RESIDENCY_TIME         5  // (seconds) Time to wait for hotend to "settle" in M109
+  #define TEMP_WINDOW                  3  // (°C) Temperature proximity for the "temperature reached" timer
+  #define TEMP_HYSTERESIS              5  // (°C) Temperature proximity considered "close enough" to the target
 #endif
 
 #if TEMP_SENSOR_BED
-  #define TEMP_BED_RESIDENCY_TIME     10  // (seconds) Time to wait for bed to "settle" in M190
-  #define TEMP_BED_WINDOW              1  // (°C) Temperature proximity for the "temperature reached" timer
-  #define TEMP_BED_HYSTERESIS          3  // (°C) Temperature proximity considered "close enough" to the target
+  #define TEMP_BED_RESIDENCY_TIME     5  // (seconds) Time to wait for bed to "settle" in M190
+  #define TEMP_BED_WINDOW              3  // (°C) Temperature proximity for the "temperature reached" timer
+  #define TEMP_BED_HYSTERESIS          5  // (°C) Temperature proximity considered "close enough" to the target
 #endif
 
 #if TEMP_SENSOR_CHAMBER
@@ -1196,11 +1196,11 @@
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
 #if NEPTUNE_3_PRO
-  #define DEFAULT_MAX_ACCELERATION      { 1100, 900, 100, 1500 }
+  #define DEFAULT_MAX_ACCELERATION      { 1100, 900, 100, 2000 }
 #elif NEPTUNE_3_PLUS
-  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 1000 }
+  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 2000 }
 #elif NEPTUNE_3_MAX
-  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 1000 }
+  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 2000 }
 #endif
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
@@ -1230,8 +1230,8 @@
  */
 #define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
-  #define DEFAULT_XJERK 10.0
-  #define DEFAULT_YJERK 10.0
+  #define DEFAULT_XJERK 8.0
+  #define DEFAULT_YJERK 8.0
   #define DEFAULT_ZJERK  0.4
   //#define DEFAULT_IJERK  0.3
   //#define DEFAULT_JJERK  0.3
@@ -1716,7 +1716,7 @@
 // The size of the printable area
 #if NEPTUNE_3_PRO
   #define X_BED_SIZE 235
-  #define Y_BED_SIZE 234
+  #define Y_BED_SIZE 232
 #elif NEPTUNE_3_PLUS
   #define X_BED_SIZE 330
   #define Y_BED_SIZE 330
@@ -2114,7 +2114,7 @@
  * Useful to retract or move the Z probe out of the way.
  */
 //#define Z_PROBE_END_SCRIPT "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
-#define Z_PROBE_END_SCRIPT "G28 Z\nG1 F200 Z0.0"
+#define Z_PROBE_END_SCRIPT "G28 Z\nG1 F200 Z0.1"
 
 // @section homing
 
@@ -2265,7 +2265,7 @@
 //
 #define PREHEAT_1_LABEL       "PLA"
 #define PREHEAT_1_TEMP_HOTEND 200
-#define PREHEAT_1_TEMP_BED     50
+#define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
@@ -2277,7 +2277,7 @@
 
 #define PREHEAT_3_LABEL       "PETG"
 #define PREHEAT_3_TEMP_HOTEND 220
-#define PREHEAT_3_TEMP_BED     60
+#define PREHEAT_3_TEMP_BED     70
 #define PREHEAT_3_TEMP_CHAMBER 35
 #define PREHEAT_3_FAN_SPEED     0 // Value from 0 to 255
 
