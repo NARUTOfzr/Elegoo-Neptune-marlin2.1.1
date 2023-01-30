@@ -641,6 +641,7 @@ class Planner {
        *
        *  Returns 1.0 if planner.z_fade_height is 0.0.
        *  Returns 0.0 if Z is past the specified 'Fade Height'.
+       * z_fade_factor: The curve function is used to optimize the Z fade height.
        */
       static float fade_scaling_factor_for_z(const_float_t rz) {
         static float z_fade_factor = 1;
@@ -648,7 +649,7 @@ class Planner {
         if (rz >= z_fade_height) return 0;
         if (last_fade_z != rz) {
           last_fade_z = rz;
-          z_fade_factor = 1 - rz * inverse_z_fade_height;
+          z_fade_factor = 1.005 * (1 - rz * inverse_z_fade_height * rz * inverse_z_fade_height) ;
         }
         return z_fade_factor;
       }
