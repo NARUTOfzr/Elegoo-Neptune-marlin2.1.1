@@ -93,9 +93,9 @@
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_MKS_E3D_V2
   #if ENABLED(RTS_AVAILABLE)
-    #define NEPTUNE_3_PRO      1
+    //#define NEPTUNE_3_PRO      1
     //#define NEPTUNE_3_PLUS   1
-    //#define NEPTUNE_3_MAX    1
+    #define NEPTUNE_3_MAX    1
     #endif
 #endif
 
@@ -1816,7 +1816,7 @@
  * RAMPS-based boards use SERVO3_PIN for the first runout sensor.
  * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
  */
-//#define FILAMENT_RUNOUT_SENSOR
+#define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
   #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.
   #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
@@ -2264,8 +2264,8 @@
 // Preheat Constants - Up to 6 are supported without changes
 //
 #define PREHEAT_1_LABEL       "PLA"
-#define PREHEAT_1_TEMP_HOTEND 200
-#define PREHEAT_1_TEMP_BED     50
+#define PREHEAT_1_TEMP_HOTEND 205
+#define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
@@ -2277,12 +2277,12 @@
 
 #define PREHEAT_3_LABEL       "PETG"
 #define PREHEAT_3_TEMP_HOTEND 220
-#define PREHEAT_3_TEMP_BED     60
+#define PREHEAT_3_TEMP_BED     70
 #define PREHEAT_3_TEMP_CHAMBER 35
 #define PREHEAT_3_FAN_SPEED     0 // Value from 0 to 255
 
 #define PREHEAT_4_LABEL       "TPU"
-#define PREHEAT_4_TEMP_HOTEND 200
+#define PREHEAT_4_TEMP_HOTEND 230
 #define PREHEAT_4_TEMP_BED     50
 #define PREHEAT_4_TEMP_CHAMBER 35
 #define PREHEAT_4_FAN_SPEED     0 // Value from 0 to 255

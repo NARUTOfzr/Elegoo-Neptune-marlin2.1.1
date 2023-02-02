@@ -102,6 +102,14 @@
   #define I2C_SDA_PIN                       PB7
 #endif
 
+// Оn the servos connector
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN                       CHECKFILEMENT0_PIN
+#endif
+
+
+
+
 //
 // Onboard SD card
 //

@@ -384,11 +384,11 @@
   #define CORP_WEBSITE            "www.elegoo.com"
 
   #if NEPTUNE_3_PRO
-    #define SOFTVERSION             "1.1.5.3-Beta"
+    #define SOFTVERSION             "1.1.5.3a"
   #elif NEPTUNE_3_PLUS
-    #define SOFTVERSION             "1.2.5.3-Beta"
+    #define SOFTVERSION             "1.2.5.3a"
   #elif NEPTUNE_3_MAX
-    #define SOFTVERSION             "1.3.5.3-Beta"
+    #define SOFTVERSION             "1.3.5.3a"
   #endif
 
   #if ENABLED(SDSUPPORT)

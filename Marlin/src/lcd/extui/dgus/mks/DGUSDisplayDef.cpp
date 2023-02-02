@@ -23,6 +23,7 @@
 #include "../../../../inc/MarlinConfigPre.h"
 
 #if ENABLED(DGUS_LCD_UI_MKS)
+//#include "../elegoo/DGUSDisplayDef.h"
 
 #include "DGUSDisplayDef.h"
 #include "../DGUSDisplay.h"
@@ -73,7 +74,7 @@ void MKS_reset_settings() {
   };
   mks_language_index = MKS_SimpleChinese;
   COPY(mks_corner_offsets, init_dgus_level_offsets);
-  mks_park_pos.set(20, 20, 10);
+  mks_park_pos.set(-5, 0, 5);//999-----
   mks_min_extrusion_temp = 0;
 }
 
@@ -89,38 +90,36 @@ void MKS_pause_print_move() {
   TERN_(POWER_LOSS_RECOVERY, if (recovery.enabled) recovery.save(true, mks_park_pos.z, true));
 
   #if ENABLED(RTS_AVAILABLE)
-    // gcode.process_subcommands_now(F("M108"));
-    // gcode.process_subcommands_now(F("M83"));
-    // gcode.process_subcommands_now(F("G1 E-10 F600"));
-    // gcode.process_subcommands_now(F("G90"));
     planner.synchronize();
     const float olde = current_position.e;
     current_position.e -= 3;
     line_to_current_position(MMM_TO_MMS(1200));
     current_position.e = olde;
     planner.set_e_position_mm(olde);
-  #endif
+    #endif
 
-  destination.z = _MIN(current_position.z + mks_park_pos.z, Z_MAX_POS);
-  prepare_internal_move_to_destination(park_speed_z);
+    destination.z = _MIN(current_position.z + mks_park_pos.z, Z_MAX_POS);
+    prepare_internal_move_to_destination(park_speed_z);
 
-  destination.set(X_MIN_POS + mks_park_pos.x, Y_MIN_POS + mks_park_pos.y);
-  prepare_internal_move_to_destination(park_speed_xy);
+    destination.set(X_MIN_POS + mks_park_pos.x, Y_MIN_POS + mks_park_pos.y);
+    prepare_internal_move_to_destination(park_speed_xy);
+
+    #if ENABLED(RTS_AVAILABLE)
+      planner.synchronize();
+      current_position.e += 2;
+      line_to_current_position(MMM_TO_MMS(200));
+      current_position.e = olde;
+      planner.set_e_position_mm(olde);
+    #endif
 }
 
 void MKS_resume_print_move() {
 
   #if ENABLED(RTS_AVAILABLE)
-    // gcode.process_subcommands_now(F("M108"));
-    // gcode.process_subcommands_now(F("M83"));
-    // gcode.process_subcommands_now(F("G1 E10 F150"));
-    // gcode.process_subcommands_now(F("G1 E-10 F600"));
-    // gcode.process_subcommands_now(F("G90"));
-
     planner.synchronize();
     const float olde = current_position.e;
-    current_position.e += 30;
-    line_to_current_position(MMM_TO_MMS(300));
+    //current_position.e += 50;
+    //line_to_current_position(MMM_TO_MMS(250));
     current_position.e -= 3;
     line_to_current_position(MMM_TO_MMS(1200));
     current_position.e = olde;
@@ -130,17 +129,12 @@ void MKS_resume_print_move() {
 
   destination.set(position_before_pause.x, position_before_pause.y);
   prepare_internal_move_to_destination(park_speed_xy);
-  //prepare_internal_move_to_destination(30);
   destination.z = position_before_pause.z;
   prepare_internal_move_to_destination(park_speed_z);
   planner.synchronize();
 
   #if ENABLED(RTS_AVAILABLE)
-    // gcode.process_subcommands_now(F("M108"));
-    // gcode.process_subcommands_now(F("M83"));
-    // gcode.process_subcommands_now(F("G1 E5 F500"));
-    // gcode.process_subcommands_now(F("G1 F2000"));
-    // gcode.process_subcommands_now(F("G90"));
+
     current_position.e += 3;
     line_to_current_position(MMM_TO_MMS(2000));
     current_position.e = olde;

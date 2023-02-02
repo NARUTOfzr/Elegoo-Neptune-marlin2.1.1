@@ -62,8 +62,8 @@
   float zprobe_zoffset;
   float last_zoffset = 0.0;
 
-  //float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 60};
-  float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 120};
+  //float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 150};
+  float manual_feedrate_mm_m[] = {50 * 60, 50 * 60, 4 * 60, 150};
 
   //bed_mesh_t z_values;
   uint8_t showcount = 0;
@@ -78,7 +78,7 @@
   float ChangeFilament0Temp = 200;
   float ChangeFilament1Temp = 200;
 
-  float current_position_x0_axis = X_MIN_POS;
+  //float current_position_x0_axis = X_MIN_POS;//0;999---
   #if ENABLED(DUAL_X_CARRIAGE)
     float current_position_x1_axis = X2_MAX_POS;
     float current_position_x1_axis = X_MIN_POS;
@@ -104,7 +104,7 @@
   char Checkfilenum = 0;
   int FilenamesCount = 0;
   char cmdbuf[20] = {0};
-  float Filament0LOAD = 50;
+  float Filament0LOAD = 50;//999----
   float Filament1LOAD = 50;
   float XoffsetValue = 0;
 
@@ -1622,14 +1622,14 @@
         if(pause_action_flag && (false == sdcard_pause_check) && printingIsPaused() && !planner.has_blocks_queued())
         {
           pause_action_flag = false;
-          if((1 == active_extruder) && (1 == save_dual_x_carriage_mode))
+          /*if((1 == active_extruder) && (1 == save_dual_x_carriage_mode))
           {
-            queue.enqueue_now_P(PSTR("G0 F3000 X350 Y0"));
+            queue.enqueue_now_P(PSTR("G0 F3000 X0 Y0"));
           }
           else
           {
-            queue.enqueue_now_P(PSTR("G0 F3000 X-50 Y0"));
-          }
+            queue.enqueue_now_P(PSTR("G0 F3000 X-5 Y0"));
+          }*/
         }
 
         #if ENABLED(RTS_AVAILABLE) 
@@ -1687,7 +1687,7 @@
           //     if(!CardReader::flag.mounted)
           //     {
           //       pause_z = current_position[Z_AXIS];
-          //       pause_e = current_position[E_AXIS] - 3;
+          //       pause_e = current_position[E_AXIS];
           //       card.pauseSDPrint();
           //       print_job_timer.pause();
           //       planner.synchronize();
@@ -1951,8 +1951,8 @@
 
           if(Checkfilenum > 10)
           {
-            pause_z = current_position[Z_AXIS];
-            pause_e = current_position[E_AXIS] - 3;
+            //pause_z = current_position[Z_AXIS];
+            //pause_e = current_position[E_AXIS];
 
             #if ENABLED(DUAL_X_CARRIAGE)
               if((0 == save_dual_x_carriage_mode) && (thermalManager.temp_hotend[0].celsius <= (thermalManager.temp_hotend[0].target - 5)))
@@ -2056,7 +2056,7 @@
                 Update_Time_Value  = 0;
                 sdcard_pause_check = false;
 
-                //planner.synchronize();              
+                planner.synchronize();              
               }
             #endif
           }
@@ -2691,8 +2691,8 @@
           //reject to receive cmd
           waitway = 1;
 
-          pause_z = current_position[Z_AXIS];
-          pause_e = current_position[E_AXIS] - 3;
+          //pause_z = current_position[Z_AXIS];
+          //pause_e = current_position[E_AXIS];
 
           //card.pauseSDPrint();
           //print_job_timer.pause();
@@ -2719,6 +2719,19 @@
 
       case ResumePrintKey:
       {
+            //const float olde = current_position.e;
+            //pause_e = current_position[E_AXIS];
+            //const float olde = current_position[E_AXIS];
+                /*
+            planner.synchronize();
+            const float olde = current_position.e;
+            current_position.e += 50;
+            line_to_current_position(MMM_TO_MMS(250));
+            current_position.e -= 3;
+            line_to_current_position(MMM_TO_MMS(1200));
+            current_position.e = olde;
+            planner.set_e_position_mm(olde);
+            planner.synchronize();*/
         if(recdat.data[0] == 1)
         {
           if(enable_filment_check)
@@ -2754,21 +2767,22 @@
             LCD_SERIAL_2.printf("\xff\xff\xff");               
           #endif
 
-          char pause_str_Z[16];
-          char pause_str_E[16];
+          //char pause_str_Z[16];
+          //char pause_str_E[16];
 
-          memset(pause_str_Z, 0, sizeof(pause_str_Z));
-          dtostrf(pause_z, 3, 2, pause_str_Z);
+          //111------
+          //memset(pause_str_Z, 0, sizeof(pause_str_Z));
+          //dtostrf(pause_z, 3, 2, pause_str_Z);
 
-          memset(pause_str_E, 0, sizeof(pause_str_E));
-          dtostrf(pause_e, 3, 2, pause_str_E);
+          //memset(pause_str_E, 0, sizeof(pause_str_E));
+          //dtostrf(pause_e, 3, 2, pause_str_E);
 
-          memset(commandbuf, 0, sizeof(commandbuf));
-          sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
-          queue.enqueue_one_now(commandbuf);
+          //memset(commandbuf, 0, sizeof(commandbuf));
+          //sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
+          //queue.enqueue_one_now(commandbuf);
 
-          memset(commandbuf, 0, sizeof(commandbuf));
-          sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
+          //memset(commandbuf, 0, sizeof(commandbuf));
+          //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
           queue.enqueue_one_now(commandbuf);
 
           //card.startFileprint();
@@ -2790,9 +2804,9 @@
             LCD_SERIAL_2.printf("page printpause");
             LCD_SERIAL_2.printf("\xff\xff\xff");
           #endif 
-        }
-        else if(recdat.data[0] == 2)
-        {
+          }
+          else if(recdat.data[0] == 2)
+          {
           if(enable_filment_check)
           {
             #if ENABLED(CHECKFILEMENT)
@@ -2862,7 +2876,7 @@
                     #endif
 
                     //char pause_str_Z[16];
-                    char pause_str_E[16];
+                    //char pause_str_E[16];
 
                     // memset(pause_str_Z, 0, sizeof(pause_str_Z));
                     // dtostrf(pause_z, 3, 2, pause_str_Z);
@@ -2870,10 +2884,10 @@
                     // sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
                     // queue.enqueue_one_now(commandbuf);
 
-                    memset(pause_str_E, 0, sizeof(pause_str_E));
-                    dtostrf(pause_e, 3, 2, pause_str_E);
-                    memset(commandbuf, 0, sizeof(commandbuf));
-                    sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
+                    //memset(pause_str_E, 0, sizeof(pause_str_E));
+                    //dtostrf(pause_e, 3, 2, pause_str_E);
+                    //memset(commandbuf, 0, sizeof(commandbuf));
+                    //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
                     queue.enqueue_one_now(commandbuf);
 
                     //card.startFileprint();
@@ -3256,18 +3270,18 @@
              LCD_SERIAL_2.printf("page wait");
              LCD_SERIAL_2.printf("\xff\xff\xff");               
             #endif
-            char pause_str_Z[16];
-            char pause_str_E[16];
-            memset(pause_str_Z, 0, sizeof(pause_str_Z));
-            dtostrf(pause_z, 3, 2, pause_str_Z);
-            memset(pause_str_E, 0, sizeof(pause_str_E));
-            dtostrf(pause_e, 3, 2, pause_str_E);
+            //char pause_str_Z[16];
+            //char pause_str_E[16];
+            //memset(pause_str_Z, 0, sizeof(pause_str_Z));
+            //dtostrf(pause_z, 3, 2, pause_str_Z);
+            //memset(pause_str_E, 0, sizeof(pause_str_E));
+            //dtostrf(pause_e, 3, 2, pause_str_E);
 
-            memset(commandbuf, 0, sizeof(commandbuf));
-            sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
-            queue.enqueue_one_now(commandbuf);
-            memset(commandbuf, 0, sizeof(commandbuf));
-            sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
+            //memset(commandbuf, 0, sizeof(commandbuf));
+            //sprintf_P(commandbuf, PSTR("G0 Z%s"), pause_str_Z);
+            //queue.enqueue_one_now(commandbuf);
+            //memset(commandbuf, 0, sizeof(commandbuf));
+            //sprintf_P(commandbuf, PSTR("G92.9 E%s"), pause_str_E);
             queue.enqueue_one_now(commandbuf);
 
             //card.startFileprint();
@@ -4567,7 +4581,7 @@
         }   
       }
       break;
-
+      //999------
       case Heater0LoadEnterKey:
       {
         #if ENABLED(TJC_AVAILABLE)
@@ -5839,6 +5853,14 @@
 
       case FilamentLoadKey:
       {
+
+        //999------记住挤出或退料前的旧值
+        //planner.synchronize();
+        const float olde = current_position.e;
+              
+        //current_position.e += PRINT_FILAMENT_LENGTH;
+        //line_to_current_position(MMM_TO_MMS(PRINT_FILAMENT_SPEED));
+
         if(recdat.data[0] == 1)
         {
           if(printJobOngoing())
@@ -5848,6 +5870,8 @@
               LCD_SERIAL_2.printf("page warn1_filament");
               LCD_SERIAL_2.printf("\xff\xff\xff");               
             #endif
+            //222---
+            //return;
           }
           else
           {
@@ -5867,7 +5891,7 @@
               //   #endif
               // }
 
-              current_position[E_AXIS] -= Filament0LOAD;
+              current_position.e -= Filament0LOAD;
               //active_extruder = 0;
               queue.enqueue_now_P(PSTR("T0"));
 
@@ -5898,6 +5922,8 @@
               LCD_SERIAL_2.printf("page warn1_filament");
               LCD_SERIAL_2.printf("\xff\xff\xff");               
             #endif
+            //222---
+            //return;
           }
           else
           {
@@ -5916,7 +5942,7 @@
               //     }
               //   #endif
               // }
-              current_position[E_AXIS] += Filament0LOAD;
+              current_position.e += Filament0LOAD;
               //active_extruder = 0;
               queue.enqueue_now_P(PSTR("T0"));
 
@@ -5928,12 +5954,14 @@
                   LCD_SERIAL_2.printf("page warn2_filament");
                   LCD_SERIAL_2.printf("\xff\xff\xff");
                 #endif 
+                //222---
+                 //return; 
               }
               else
               {
                 RTS_line_to_current(E_AXIS);
                 RTS_SndData(10 * Filament0LOAD, HEAD0_FILAMENT_LOAD_DATA_VP);
-                //planner.synchronize();
+                planner.synchronize();
               }
             }
           }
@@ -6088,8 +6116,9 @@
 
             //reject to receive cmd
             waitway = 1;
-            pause_z = current_position[Z_AXIS];
-            pause_e = current_position[E_AXIS] - 3;
+            //222----
+            //pause_z = current_position[Z_AXIS];
+            //pause_e = current_position[E_AXIS];
 
             card.pauseSDPrint();
             print_job_timer.pause();
@@ -6145,13 +6174,17 @@
         }
         else if(recdat.data[0] == 0x0E)
         {
-          current_position[E_AXIS] -= Filament0LOAD;
+          current_position.e -= Filament0LOAD;
           RTS_line_to_current(E_AXIS);
+          //333----
+          current_position.e = olde;
         }
         else if(recdat.data[0] == 0x0F)
         {
-          current_position[E_AXIS] += Filament0LOAD;
+          current_position.e += Filament0LOAD;
           RTS_line_to_current(E_AXIS);
+          //333----
+          current_position.e = olde;
         }
         else if(recdat.data[0] == 0x10)
         {
@@ -6185,6 +6218,13 @@
         {
           break;
         }
+        //999----
+        //current_position[E_AXIS] = olde;
+        current_position.e = olde;
+        planner.set_e_position_mm(olde);
+        //planner.synchronize();
+        //planner.set_e_position_mm(current_position[E_AXIS]);
+        //planner.synchronize();
       }
       break;
 
