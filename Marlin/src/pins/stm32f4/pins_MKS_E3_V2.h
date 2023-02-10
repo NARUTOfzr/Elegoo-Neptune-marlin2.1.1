@@ -73,6 +73,11 @@
 #define LED3_PIN                            PB9    //顶灯
 
 //
+// BEEPER
+//
+#define BEEPER_PIN                          PC15   //蜂鸣器
+
+//
 // Auto fans
 //
 #define AUTO_FAN_PIN                        PB0    //FAN2

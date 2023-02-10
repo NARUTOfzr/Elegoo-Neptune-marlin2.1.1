@@ -4114,9 +4114,10 @@ void Temperature::isr() {
             rtscheck.RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
             #if ENABLED(TJC_AVAILABLE)
               //全局变量
+              restFlag1 = 0;
+              restFlag2 = 1;
               LCD_SERIAL_2.printf("restFlag1=0");
               LCD_SERIAL_2.printf("\xff\xff\xff");
-              
               LCD_SERIAL_2.printf("restFlag2=1");
               LCD_SERIAL_2.printf("\xff\xff\xff");
 
