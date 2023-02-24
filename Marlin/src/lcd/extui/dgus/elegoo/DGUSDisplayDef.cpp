@@ -181,11 +181,13 @@
 
   char tmpfilename[32];
 
-  bool abortSD_flag   = false;
-  bool RTS_M600_Flag  = false;
-  bool Home_stop_flag = false;
-
+  bool abortSD_flag     = false;
+  bool RTS_M600_Flag    = false;
+  bool Home_stop_flag   = false;
   bool Move_finish_flag = true;
+
+  uint8_t restFlag1 = 0;
+  uint8_t restFlag2 = 0;
 
   void RTS_reset_settings(void) 
   {
@@ -1388,6 +1390,9 @@
               LCD_SERIAL_2.printf("page main");
               LCD_SERIAL_2.printf("\xff\xff\xff");
 
+              //开照明灯
+              OUT_WRITE(LED3_PIN, LOW);
+
             #endif
 
             Update_Time_Value = RTS_UPDATE_VALUE;  
@@ -1664,9 +1669,15 @@
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");  
 
-            //Z轴高度
+            //首页-Z轴高度
             memset(temp,0,sizeof(temp));
             sprintf(temp, "main.zvalue.val=%d", (int)(1000 * current_position[Z_AXIS]));
+            LCD_SERIAL_2.printf(temp);
+            LCD_SERIAL_2.printf("\xff\xff\xff");
+
+            //打印中-Z轴高度  
+            memset(temp,0,sizeof(temp));
+            sprintf(temp, "printpause.zvalue.val=%d", (int)(10 * current_position[Z_AXIS]));
             LCD_SERIAL_2.printf(temp);
             LCD_SERIAL_2.printf("\xff\xff\xff");
 
@@ -1680,6 +1691,7 @@
         #endif
 
         #if ENABLED(SDSUPPORT)
+        
           // if((sd_printing_autopause == true) && (PoweroffContinue == true))
           // {
           //   if(true == sdcard_pause_check)
@@ -2135,6 +2147,8 @@
         {
           pause_count_pos++;
           #if ENABLED(TJC_AVAILABLE)
+            restFlag1 = 0;
+            restFlag2 = 1;
             LCD_SERIAL_2.printf("restFlag1=0");
             LCD_SERIAL_2.printf("\xff\xff\xff");
             LCD_SERIAL_2.printf("restFlag2=1");
@@ -2597,6 +2611,7 @@
         {
           #if ENABLED(TJC_AVAILABLE)
             planner.flow_percentage[0] = 100; 
+            planner.refresh_e_factor(0);
             memset(temp,0,sizeof(temp));
             sprintf(temp, "adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
             LCD_SERIAL_2.printf(temp);
@@ -2682,6 +2697,10 @@
         }
         else if(recdat.data[0] == 0xF1)
         {
+          restFlag1 = 1;
+          LCD_SERIAL_2.printf("restFlag1=1");
+          LCD_SERIAL_2.printf("\xff\xff\xff");
+
           RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
           #if ENABLED(TJC_AVAILABLE) 
             LCD_SERIAL_2.printf("page wait");
@@ -2760,6 +2779,10 @@
               #endif
             #endif
           }
+
+          restFlag1 = 0;
+          LCD_SERIAL_2.printf("restFlag1=0");
+          LCD_SERIAL_2.printf("\xff\xff\xff");
 
           RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
           #if ENABLED(TJC_AVAILABLE) 
@@ -3006,10 +3029,9 @@
             #if ENABLED(TJC_AVAILABLE)
               LCD_SERIAL_2.printf("page printpause");
               LCD_SERIAL_2.printf("\xff\xff\xff");
-
+              restFlag2 = 0;
               LCD_SERIAL_2.printf("restFlag2=0");
               LCD_SERIAL_2.printf("\xff\xff\xff");
-              
               pause_count_pos = 0;
             #endif
 
@@ -3535,9 +3557,9 @@
           }
           else if(speed_ctrl==2)
           {
-            if((planner.flow_percentage[0] + unit)>300)
+            if((planner.flow_percentage[0] + unit)>150)
             {
-              planner.flow_percentage[0] = 300;
+              planner.flow_percentage[0] = 150;
             }
             else 
             {
@@ -3596,9 +3618,9 @@
           }
           else if(speed_ctrl==2)
           {
-            if((planner.flow_percentage[0] - unit)<100)
+            if((planner.flow_percentage[0] - unit)<50)
             {
-              planner.flow_percentage[0] = 100;
+              planner.flow_percentage[0] = 50;
             }
             else 
             {
@@ -5553,6 +5575,17 @@
         }
         else if(recdat.data[0] == 0x16) //printpause恢复页面后获取一次信息
         {
+          //暂停打印按钮激活功能
+          memset(temp,0,sizeof(temp));
+          sprintf(temp, "restFlag1=%d", restFlag1);
+          LCD_SERIAL_2.printf(temp); 
+          LCD_SERIAL_2.printf("\xff\xff\xff");
+
+          memset(temp,0,sizeof(temp));
+          sprintf(temp, "restFlag2=%d", restFlag2);
+          LCD_SERIAL_2.printf(temp); 
+          LCD_SERIAL_2.printf("\xff\xff\xff");
+
           //机型信息
           #if ENABLED(NEPTUNE_3_PLUS)
             LCD_SERIAL_2.printf("main.va0.val=2");  
@@ -6311,12 +6344,11 @@
               
               RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
               #if ENABLED(TJC_AVAILABLE)
+                restFlag2 = 0;
                 LCD_SERIAL_2.printf("restFlag2=0");
                 LCD_SERIAL_2.printf("\xff\xff\xff");
-                
                 LCD_SERIAL_2.printf("page printpause");
                 LCD_SERIAL_2.printf("\xff\xff\xff");
-
                 pause_count_pos = 0;
               #endif
 
@@ -6593,6 +6625,7 @@
             LCD_SERIAL_2.printf("page printpause");
             LCD_SERIAL_2.printf("\xff\xff\xff");
 
+            restFlag2 = 0;
             LCD_SERIAL_2.printf("restFlag2=0");
             LCD_SERIAL_2.printf("\xff\xff\xff");
 

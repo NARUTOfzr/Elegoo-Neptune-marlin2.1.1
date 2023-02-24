@@ -208,6 +208,9 @@
   extern bool Home_stop_flag;
   extern bool Move_finish_flag; 
 
+  extern uint8_t restFlag1;
+  extern uint8_t restFlag2;
+
   #define PIC_TXT_GOCDE     
 
   /************struct**************/
@@ -384,11 +387,11 @@
   #define CORP_WEBSITE            "www.elegoo.com"
 
   #if NEPTUNE_3_PRO
-    #define SOFTVERSION             "1.1.5.3a"
+    #define SOFTVERSION             "1.1.5.1a"
   #elif NEPTUNE_3_PLUS
-    #define SOFTVERSION             "1.2.5.3a"
+    #define SOFTVERSION             "1.2.5.1a"
   #elif NEPTUNE_3_MAX
-    #define SOFTVERSION             "1.3.5.3a"
+    #define SOFTVERSION             "1.3.5.1a"
   #endif
 
   #if ENABLED(SDSUPPORT)

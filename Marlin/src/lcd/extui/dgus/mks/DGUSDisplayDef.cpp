@@ -136,7 +136,8 @@ void MKS_resume_print_move() {
   #if ENABLED(RTS_AVAILABLE)
 
     current_position.e += 3;
-    line_to_current_position(MMM_TO_MMS(2000));
+    //line_to_current_position(MMM_TO_MMS(2000));
+    line_to_current_position(MMM_TO_MMS(200));
     current_position.e = olde;
     planner.set_e_position_mm(olde);
     planner.synchronize();

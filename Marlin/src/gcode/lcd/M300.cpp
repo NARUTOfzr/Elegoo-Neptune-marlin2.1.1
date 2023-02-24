@@ -33,13 +33,22 @@
  * M300: Play beep sound S<frequency Hz> P<duration ms>
  */
 void GcodeSuite::M300() {
-  uint16_t const frequency = parser.ushortval('S', 260);
-  uint16_t duration = parser.ushortval('P', 1000);
 
-  // Limits the tone duration to 0-5 seconds.
-  NOMORE(duration, 5000U);
+  #ifdef TJC_AVAILABLE
+    uint16_t duration = parser.ushortval('P', 1000);
+    char temp[16];
+    memset(temp,0,sizeof(temp));
+    sprintf(temp, "beep %d", duration); 
+    LCD_SERIAL_2.printf(temp);
+    LCD_SERIAL_2.printf("\xff\xff\xff");
+  #else
+    uint16_t const frequency = parser.ushortval('S', 260);
+    uint16_t duration = parser.ushortval('P', 1000);
+    // Limits the tone duration to 0-5 seconds.
+    NOMORE(duration, 5000U);
+    BUZZ(duration, frequency);
+  #endif
 
-  BUZZ(duration, frequency);
 }
 
 #endif // HAS_SOUND
