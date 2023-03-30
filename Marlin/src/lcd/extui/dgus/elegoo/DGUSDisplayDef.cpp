@@ -744,6 +744,11 @@
     // represents to update file list
     if(CardUpdate && lcd_sd_status && RTS_SD_Detected())
     {
+      //If you are not in the printing state when entering the file list menu, remount the SD card to prevent it from loosening halfway and causing errors when printing documents later
+      if(!card.isPrinting()){
+        RTS_SDCardInit();
+      }
+
       for(uint16_t i = 0;i < CardRecbuf.Filesum;i ++)
       {
         delay(1);
