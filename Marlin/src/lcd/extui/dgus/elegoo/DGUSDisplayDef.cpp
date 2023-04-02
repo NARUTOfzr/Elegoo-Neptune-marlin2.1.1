@@ -438,7 +438,7 @@
   }
 
 #if ENABLED(TJC_AVAILABLE)
-  #define TJS_SendCmd(fmt, arg...) LCD_SERIAL_2.printf(fmt, ##arg);LCD_SERIAL_2.printf("\xff\xff\xff")
+  #define TJC_SendCmd(fmt, arg...) LCD_SERIAL_2.printf(fmt, ##arg);LCD_SERIAL_2.printf("\xff\xff\xff")
 
   /*
     发送预览图统一使用printpause页面的va0,va1作为buffer
@@ -453,7 +453,7 @@
     while(1)
     {
       TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-      TJS_SendCmd("printpause.va1.txt=\"\"");
+      TJC_SendCmd("printpause.va1.txt=\"\"");
       memset(buffer, 0, sizeof(buffer));
       int16_t bytes = file.read(buffer, sizeof(buffer));    
       LCD_SERIAL_2.printf("printpause.va0.txt=");
@@ -461,11 +461,11 @@
       LCD_SERIAL_2.write(buffer, sizeof(buffer));
       LCD_SERIAL_2.write('"');
       LCD_SERIAL_2.printf("\xff\xff\xff");
-      TJS_SendCmd("printpause.va1.txt+=printpause.va0.txt");    
+      TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");    
       if(bytes <= 0) 
       {
-        TJS_SendCmd("%s.cp0.aph=127", page);
-        TJS_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
+        TJC_SendCmd("%s.cp0.aph=127", page);
+        TJC_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
         file.close();
         break;
       };
@@ -479,7 +479,7 @@
     if(!file.open(filename))
       return false;
 
-    TJS_SendCmd("printpause.va1.txt=\"\"");
+    TJC_SendCmd("printpause.va1.txt=\"\"");
     uint32_t gPicturePreviewStart = 0;
     uint64_t cnt_pre = 0;
     uint8_t buffer[1024];
@@ -496,8 +496,8 @@
       if(m1)
       {
         cnt_pre = 0;
-        TJS_SendCmd("%s.cp0.aph=0", page);
-        TJS_SendCmd("%s.cp0.close()", page);
+        TJC_SendCmd("%s.cp0.aph=0", page);
+        TJC_SendCmd("%s.cp0.close()", page);
         break;
       }
       
@@ -534,8 +534,8 @@
                 uint32_t *p4 = (uint32_t *)strstr((char *)buffer, ";;gimage:");
                 if(p1 == 0 && p2 == 0 && p4 == 0 && p3)
                 {
-                  TJS_SendCmd("%s.cp0.aph=127", page);
-                  TJS_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
+                  TJC_SendCmd("%s.cp0.aph=127", page);
+                  TJC_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
                   break;
                 }
 
@@ -546,12 +546,12 @@
                   LCD_SERIAL_2.write(&buffer[9], 1023 - 9);
                   LCD_SERIAL_2.write('"');
                   LCD_SERIAL_2.printf("\xff\xff\xff");
-                  TJS_SendCmd("printpause.va1.txt+=printpause.va0.txt");
-                  TJS_SendCmd("%s.cp0.aph=127", page);
+                  TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");
+                  TJC_SendCmd("%s.cp0.aph=127", page);
                   TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                   delay(200);
                   TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-                  TJS_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
+                  TJC_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
                   cnt_pre = 102400;
                   break;
                 }
@@ -563,7 +563,7 @@
                   LCD_SERIAL_2.write(&buffer[8], 1023 - 8);
                   LCD_SERIAL_2.write('"');
                   LCD_SERIAL_2.printf("\xff\xff\xff");
-                  TJS_SendCmd("printpause.va1.txt+=printpause.va0.txt");
+                  TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");
                   TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                   delay(200);
                   TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -587,8 +587,8 @@
 
   static void TJC_SendThumbnail(const char *page)
   {
-    TJS_SendCmd("%s.cp0.close()", page);
-    TJS_SendCmd("%s.cp0.aph=0", page);
+    TJC_SendCmd("%s.cp0.close()", page);
+    TJC_SendCmd("%s.cp0.aph=0", page);
     char picname[64];
     sprintf(picname,"%s.txt", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
     if (TJC_sendThumbnailFromFile(page, picname))
@@ -600,7 +600,7 @@
       delay(20);
   }
 #else
-  #define TJS_SendCmd(fmt, arg...)
+  #define TJC_SendCmd(fmt, arg...)
   static void TJC_SendThumbnail() {}
 #endif
 
@@ -616,11 +616,11 @@
     //   uint8_t page_num = ((filecount / 5) + 1);
     //   if (filelist.seek(filecount)) 
     //   {                   
-    //     TJS_SendCmd("file%d.t%d.txt=\"%s\"", page_num, filecount , filelist.filename());
+    //     TJC_SendCmd("file%d.t%d.txt=\"%s\"", page_num, filecount , filelist.filename());
     //   }
     //   else
     //   {
-    //     TJS_SendCmd("file%d.t%d.txt=\"\"", page_num, filecount);
+    //     TJC_SendCmd("file%d.t%d.txt=\"\"", page_num, filecount);
     //   }
     // }
 
@@ -671,14 +671,14 @@
 
           #if ENABLED(TJC_AVAILABLE)
             uint8_t page_num = ((j / 5) + 1);
-            TJS_SendCmd("file%d.t%d.txt=\"\"", page_num, j);
+            TJC_SendCmd("file%d.t%d.txt=\"\"", page_num, j);
           #endif
         }
 
         //显示文件名
         #if ENABLED(TJC_AVAILABLE)
           uint8_t page_num = ((num / 5) + 1);
-          TJS_SendCmd("file%d.t%d.txt=\"%s\"", page_num, num, CardRecbuf.Cardshowfilename[num]);       
+          TJC_SendCmd("file%d.t%d.txt=\"%s\"", page_num, num, CardRecbuf.Cardshowfilename[num]);       
         #endif
 
         CardRecbuf.Filesum = (++num);
@@ -715,7 +715,7 @@
           //清除文件 
           #if ENABLED(TJC_AVAILABLE)
             uint8_t page_num = ((j / 5) + 1);
-            TJS_SendCmd("file%d.t%d.txt=\"\"", page_num, j); 
+            TJC_SendCmd("file%d.t%d.txt=\"\"", page_num, j); 
             delay(10); 
           #endif
         }
@@ -775,10 +775,10 @@
       RTS_SndData(0, PRINT_FILE_TEXT_VP + j); // clean screen.
       RTS_SndData(0, SELECT_FILE_TEXT_VP + j); // clean filename
     }
-    TJS_SendCmd("printpause.cp0.close()");
-    TJS_SendCmd("printpause.cp0.aph=0");
-    TJS_SendCmd("printpause.va0.txt=\"\"");
-    TJS_SendCmd("printpause.va1.txt=\"\"");
+    TJC_SendCmd("printpause.cp0.close()");
+    TJC_SendCmd("printpause.cp0.aph=0");
+    TJC_SendCmd("printpause.va0.txt=\"\"");
+    TJC_SendCmd("printpause.va1.txt=\"\"");
   }
 
   bool RTSSHOW::RTS_SD_Detected(void)
@@ -853,7 +853,7 @@
             {
               //清除文件       
               uint8_t page_num = ((j / 5) + 1);
-              TJS_SendCmd("file%d.t%d.txt=\"\"", page_num, j);
+              TJC_SendCmd("file%d.t%d.txt=\"\"", page_num, j);
             }
           #endif
 
@@ -883,7 +883,7 @@
         delay(1);
         #if ENABLED(TJC_AVAILABLE)
           uint8_t page_num = ((i / 5) + 1);
-          TJS_SendCmd("file%d.t%d.txt=\"%s\"", page_num, i, CardRecbuf.Cardshowfilename[i]);       
+          TJC_SendCmd("file%d.t%d.txt=\"%s\"", page_num, i, CardRecbuf.Cardshowfilename[i]);       
         #endif
       }
       CardUpdate = false;
@@ -963,14 +963,14 @@
             #endif
 
             #if ENABLED(NEPTUNE_3_PLUS)
-              //TJS_SendCmd("leveldata_49.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
-              TJS_SendCmd("aux49_data.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
+              //TJC_SendCmd("leveldata_49.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
+              TJC_SendCmd("aux49_data.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
             #elif ENABLED(NEPTUNE_3_MAX)
-              //TJS_SendCmd("leveldata_64.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
-              //TJS_SendCmd("aux64_data.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
-              TJS_SendCmd("aux63_data.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据            
+              //TJC_SendCmd("leveldata_64.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
+              //TJC_SendCmd("aux64_data.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
+              TJC_SendCmd("aux63_data.x%d.val=%d",showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据            
             #elif ENABLED(NEPTUNE_3_PRO)
-              TJS_SendCmd("leveldata_36.x%d.val=%d",(int)showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
+              TJC_SendCmd("leveldata_36.x%d.val=%d",(int)showcount,(int)(bedlevel.z_values[x][y]*100)); //显示数据
             #endif
 
             showcount++;
@@ -982,7 +982,7 @@
     last_zoffset = zprobe_zoffset = probe.offset.z;
     #if ENABLED(RTS_AVAILABLE)
       RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-      TJS_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
+      TJC_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
     #endif
 
     #if ENABLED(DUAL_X_CARRIAGE)
@@ -1040,18 +1040,18 @@
       RTS_SndData(CORP_WEBSITE, PRINTER_WEBSITE_TEXT_VP);
 
       //主板软件版本
-      TJS_SendCmd("information.sversion.txt=\"%s\"", SOFTVERSION);
+      TJC_SendCmd("information.sversion.txt=\"%s\"", SOFTVERSION);
 
       /**************************some info init*******************************/
       RTS_SndData(0, PRINT_PROCESS_ICON_VP);
 
       //机型确认
       #if ENABLED(NEPTUNE_3_PLUS)
-        TJS_SendCmd("main.va0.val=2");
+        TJC_SendCmd("main.va0.val=2");
       #elif ENABLED(NEPTUNE_3_PRO)
-        TJS_SendCmd("main.va0.val=1");                    
+        TJC_SendCmd("main.va0.val=1");                    
       #elif ENABLED(NEPTUNE_3_MAX)
-        TJS_SendCmd("main.va0.val=3");  
+        TJC_SendCmd("main.va0.val=3");  
       #endif  
 
       //EachMomentUpdate();
@@ -1175,19 +1175,19 @@
               }
               rtscheck.RTS_SndData(StartSoundSet, SoundAddr);
               #if ENABLED(TJC_AVAILABLE)
-                TJS_SendCmd("page boot");
-                TJS_SendCmd("com_star");
+                TJC_SendCmd("page boot");
+                TJC_SendCmd("com_star");
                 #if ENABLED(NEPTUNE_3_PLUS)
-                  TJS_SendCmd("main.va0.val=2");
+                  TJC_SendCmd("main.va0.val=2");
                 #elif ENABLED(NEPTUNE_3_PRO)
-                  TJS_SendCmd("main.va0.val=1");
+                  TJC_SendCmd("main.va0.val=1");
                 #elif ENABLED(NEPTUNE_3_MAX)
-                  TJS_SendCmd("main.va0.val=3");
+                  TJC_SendCmd("main.va0.val=3");
                 #endif
 
                 for(count_startprogress=0;count_startprogress<=100;count_startprogress++)
                 {
-                  TJS_SendCmd("boot.j0.val=%d", count_startprogress);
+                  TJC_SendCmd("boot.j0.val=%d", count_startprogress);
                   delay(30);
                   TERN_(USE_WATCHDOG, hal.watchdog_refresh(););
                 }
@@ -1199,9 +1199,9 @@
                 {
                   rtscheck.RTS_SndData(CardRecbuf.Cardshowfilename[i], PRINT_FILE_TEXT_VP);
                   rtscheck.RTS_SndData(ExchangePageBase + 36, ExchangepageAddr);
-                  TJS_SendCmd("continueprint.t0.txt=\"%s\"",CardRecbuf.Cardshowfilename[i]); //显示文件名
-                  TJS_SendCmd("printpause.t0.txt=\"%s\"",CardRecbuf.Cardshowfilename[i]); //显示文件名
-                  TJS_SendCmd("page continueprint");
+                  TJC_SendCmd("continueprint.t0.txt=\"%s\"",CardRecbuf.Cardshowfilename[i]); //显示文件名
+                  TJC_SendCmd("printpause.t0.txt=\"%s\"",CardRecbuf.Cardshowfilename[i]); //显示文件名
+                  TJC_SendCmd("page continueprint");
                   // 图片预览
                   // TJC_SendThumbnail("printpause");
                   break;
@@ -1226,23 +1226,23 @@
             #endif
 
             #if ENABLED(TJC_AVAILABLE)
-              TJS_SendCmd("page boot");
+              TJC_SendCmd("page boot");
               #if ENABLED(NEPTUNE_3_PLUS)
-                TJS_SendCmd("main.va0.val=2");
+                TJC_SendCmd("main.va0.val=2");
               #elif ENABLED(NEPTUNE_3_PRO)
-                TJS_SendCmd("main.va0.val=1");
+                TJC_SendCmd("main.va0.val=1");
               #elif ENABLED(NEPTUNE_3_MAX)
-                TJS_SendCmd("main.va0.val=3");
+                TJC_SendCmd("main.va0.val=3");
               #endif
 
               // 进度条
               for(count_startprogress=0;count_startprogress<=100;count_startprogress++)
               {
-                TJS_SendCmd("boot.j0.val=%d", count_startprogress);
+                TJC_SendCmd("boot.j0.val=%d", count_startprogress);
                 delay(30);
                 TERN_(USE_WATCHDOG, hal.watchdog_refresh());
               }
-              TJS_SendCmd("page main");
+              TJC_SendCmd("page main");
               //开照明灯
               OUT_WRITE(LED3_PIN, LOW);
 
@@ -1252,7 +1252,7 @@
           }
 
           #if ENABLED(POWER_LOSS_RECOVERY)
-            TJS_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
+            TJC_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
           #endif
         }
       #else
@@ -1272,27 +1272,27 @@
           rtscheck.RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
 
           #if ENABLED(TJC_AVAILABLE)
-            TJS_SendCmd("page boot");
+            TJC_SendCmd("page boot");
             #if ENABLED(NEPTUNE_3_PLUS)
-              TJS_SendCmd("main.va0.val=2");
+              TJC_SendCmd("main.va0.val=2");
             #elif ENABLED(NEPTUNE_3_PRO)
-              TJS_SendCmd("main.va0.val=1");
+              TJC_SendCmd("main.va0.val=1");
             #elif ENABLED(NEPTUNE_3_MAX)
-              TJS_SendCmd("main.va0.val=3");
+              TJC_SendCmd("main.va0.val=3");
             #endif
 
             // 进度条
             for(count_startprogress=0;count_startprogress<=100;count_startprogress++)
             {
-              TJS_SendCmd("boot.j0.val=%d", count_startprogress);
+              TJC_SendCmd("boot.j0.val=%d", count_startprogress);
               delay(30);
               TERN_(USE_WATCHDOG, hal.watchdog_refresh());
             }
-            TJS_SendCmd("page main");
+            TJC_SendCmd("page main");
           #endif
 
           #if ENABLED(POWER_LOSS_RECOVERY)
-            TJS_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
+            TJC_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
           #endif
         }
       #endif
@@ -1304,34 +1304,34 @@
           {
             OUT_WRITE(LED2_PIN, LOW);
             status_led1 = false;
-            TJS_SendCmd("status_led1=0");
+            TJC_SendCmd("status_led1=0");
           }
           else if(printJobOngoing())
           {
             OUT_WRITE(LED2_PIN, HIGH);
             status_led1 = true;
-            TJS_SendCmd("status_led1=1");
+            TJC_SendCmd("status_led1=1");
           }
           else
           {
             OUT_WRITE(LED2_PIN, LOW);
             status_led1 = false;
-            TJS_SendCmd("status_led1=0");
+            TJC_SendCmd("status_led1=0");
           }
         }
       #endif
 
-      TJS_SendCmd("set.va1.val=%d", enable_filment_check);
+      TJC_SendCmd("set.va1.val=%d", enable_filment_check);
       if (thermalManager.fan_speed[0])
       {
-        TJS_SendCmd("set.va0.val=1");
+        TJC_SendCmd("set.va0.val=1");
       }
       else
       {
-        TJS_SendCmd("set.va0.val=0");
+        TJC_SendCmd("set.va0.val=0");
       }
       #if ENABLED(POWER_LOSS_RECOVERY)
-        TJS_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
+        TJC_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
       #endif
 
       if(!flag_power_on)
@@ -1428,19 +1428,19 @@
           rtscheck.RTS_SndData(thermalManager.temp_bed.celsius, BED_CURRENT_TEMP_VP);
 
           //挤出头温度信息
-          TJS_SendCmd("main.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("main.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
           //热床温度信息
-          TJS_SendCmd("main.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("main.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
           //X轴坐标
-          TJS_SendCmd("main.xvalue.val=%d", (int)(100 * current_position[X_AXIS]));
+          TJC_SendCmd("main.xvalue.val=%d", (int)(100 * current_position[X_AXIS]));
           //Y轴坐标
-          TJS_SendCmd("main.yvalue.val=%d", (int)(100 * current_position[Y_AXIS]));
+          TJC_SendCmd("main.yvalue.val=%d", (int)(100 * current_position[Y_AXIS]));
           //首页-Z轴高度
-          TJS_SendCmd("main.zvalue.val=%d", (int)(1000 * current_position[Z_AXIS]));
+          TJC_SendCmd("main.zvalue.val=%d", (int)(1000 * current_position[Z_AXIS]));
           //打印中-Z轴高度  
-          TJS_SendCmd("printpause.zvalue.val=%d", (int)(10 * current_position[Z_AXIS]));
+          TJC_SendCmd("printpause.zvalue.val=%d", (int)(10 * current_position[Z_AXIS]));
           //风扇速度
-          TJS_SendCmd("main.fanspeed.txt=\"%d\"", thermalManager.fan_speed[0]);
+          TJC_SendCmd("main.fanspeed.txt=\"%d\"", thermalManager.fan_speed[0]);
         #endif
 
         #if ENABLED(SDSUPPORT)
@@ -1523,12 +1523,12 @@
             if(printingIsPaused())
             {
               rtscheck.RTS_SndData(ExchangePageBase + 16, ExchangepageAddr); //新UI处理
-              TJS_SendCmd("page adjusttemp");
+              TJC_SendCmd("page adjusttemp");
             }
             else
             {
               rtscheck.RTS_SndData(ExchangePageBase + 31, ExchangepageAddr); //新UI处理
-              TJS_SendCmd("page prefilament");
+              TJC_SendCmd("page prefilament");
             }
             rtscheck.RTS_SndData(10 * Filament0LOAD, HEAD0_FILAMENT_LOAD_DATA_VP);
           #endif
@@ -1542,12 +1542,12 @@
             if(printingIsPaused())
             {
               rtscheck.RTS_SndData(ExchangePageBase + 16, ExchangepageAddr); //新UI处理
-              TJS_SendCmd("page adjusttemp");
+              TJC_SendCmd("page adjusttemp");
             }
             else
             {
               rtscheck.RTS_SndData(ExchangePageBase + 31, ExchangepageAddr); //新UI处理
-              TJS_SendCmd("page prefilament");
+              TJC_SendCmd("page prefilament");
             }
             rtscheck.RTS_SndData(10 * Filament1LOAD, HEAD1_FILAMENT_LOAD_DATA_VP);
           #endif
@@ -1738,7 +1738,7 @@
               else
               {
                 rtscheck.RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-                TJS_SendCmd("page wait");
+                TJC_SendCmd("page wait");
                 waitway = 5;
 
                 #if ENABLED(POWER_LOSS_RECOVERY)
@@ -1762,7 +1762,7 @@
 
                 #if ENABLED(RTS_AVAILABLE)
                   rtscheck.RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-                  TJS_SendCmd("page wait");
+                  TJC_SendCmd("page wait");
                 #endif
 
                 // #if ENABLED(POWER_LOSS_RECOVERY)
@@ -1819,13 +1819,13 @@
       if(waitway == 1)
       {
         rtscheck.RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
-        TJS_SendCmd("page printpause");
+        TJC_SendCmd("page printpause");
         waitway = 0;
       }
       else if(waitway == 5)
       {
         rtscheck.RTS_SndData(ExchangePageBase + 39, ExchangepageAddr);
-        TJS_SendCmd("page noFilamentPush");
+        TJC_SendCmd("page noFilamentPush");
         waitway = 0;
       }
       else if(waitway == 7)
@@ -1835,7 +1835,7 @@
 
         #if ENABLED(RTS_AVAILABLE)
           rtscheck.RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
-          TJS_SendCmd("page main");
+          TJC_SendCmd("page main");
         #endif
 
         queue.enqueue_now_P(PSTR("M84"));
@@ -1854,8 +1854,8 @@
           #if ENABLED(TJC_AVAILABLE)
             restFlag1 = 0;
             restFlag2 = 1;
-            TJS_SendCmd("restFlag1=0");
-            TJS_SendCmd("restFlag2=1");
+            TJC_SendCmd("restFlag1=0");
+            TJC_SendCmd("restFlag2=1");
           #endif
           abortSD_flag = true;  
         }
@@ -1874,21 +1874,21 @@
       #endif
 
       #if ENABLED(NEPTUNE_3_PLUS)
-        //TJS_SendCmd("page leveldata_49");
-        TJS_SendCmd("page aux49_data");
-        TJS_SendCmd("leveling_49.tm0.en=0");
+        //TJC_SendCmd("page leveldata_49");
+        TJC_SendCmd("page aux49_data");
+        TJC_SendCmd("leveling_49.tm0.en=0");
       #elif ENABLED(NEPTUNE_3_PRO)
-        TJS_SendCmd("page leveldata_36");
-        TJS_SendCmd("leveling_36.tm0.en=0");
+        TJC_SendCmd("page leveldata_36");
+        TJC_SendCmd("leveling_36.tm0.en=0");
       #elif ENABLED(NEPTUNE_3_MAX)
-        //TJS_SendCmd("page leveldata_64");
-        //TJS_SendCmd("page aux64_data");
-        TJS_SendCmd("page aux63_data");
-        //TJS_SendCmd("leveling_64.tm0.en=0");
-        TJS_SendCmd("leveling_63.tm0.en=0");
+        //TJC_SendCmd("page leveldata_64");
+        //TJC_SendCmd("page aux64_data");
+        TJC_SendCmd("page aux63_data");
+        //TJC_SendCmd("leveling_64.tm0.en=0");
+        TJC_SendCmd("leveling_63.tm0.en=0");
       #endif
-      TJS_SendCmd("leveling.tm0.en=0");
-      TJS_SendCmd("page warn_zoffset");
+      TJC_SendCmd("leveling.tm0.en=0");
+      TJC_SendCmd("page warn_zoffset");
     }
   }
 
@@ -1899,7 +1899,7 @@
       waitway = 0;
       #if ENABLED(RTS_AVAILABLE)
         rtscheck.RTS_SndData(ExchangePageBase + 29 + (AxisUnitMode - 1), ExchangepageAddr);
-        TJS_SendCmd("page premove");
+        TJC_SendCmd("page premove");
       #endif
     }
     else if(waitway == 6)
@@ -1915,20 +1915,20 @@
       #endif
 
       #if ENABLED(NEPTUNE_3_PLUS)
-        //TJS_SendCmd("page leveldata_49");
-        TJS_SendCmd("page aux49_data");
-        TJS_SendCmd("leveling_49.tm0.en=0");
+        //TJC_SendCmd("page leveldata_49");
+        TJC_SendCmd("page aux49_data");
+        TJC_SendCmd("leveling_49.tm0.en=0");
       #elif ENABLED(NEPTUNE_3_PRO)
-        TJS_SendCmd("page leveldata_36");
-        TJS_SendCmd("leveling_36.tm0.en=0");
+        TJC_SendCmd("page leveldata_36");
+        TJC_SendCmd("leveling_36.tm0.en=0");
       #elif ENABLED(NEPTUNE_3_MAX)
-        //TJS_SendCmd("page leveldata_64");
-        //TJS_SendCmd("page aux64_data");
-        TJS_SendCmd("page aux63_data");
-        //TJS_SendCmd("leveling_64.tm0.en=0");
-        TJS_SendCmd("leveling_63.tm0.en=0");
+        //TJC_SendCmd("page leveldata_64");
+        //TJC_SendCmd("page aux64_data");
+        TJC_SendCmd("page aux63_data");
+        //TJC_SendCmd("leveling_64.tm0.en=0");
+        TJC_SendCmd("leveling_63.tm0.en=0");
       #endif
-      TJS_SendCmd("leveling.tm0.en=0");
+      TJC_SendCmd("leveling.tm0.en=0");
     }
     else if(waitway == 7)
     {
@@ -1937,7 +1937,7 @@
 
       #if ENABLED(RTS_AVAILABLE)
         rtscheck.RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
-        TJS_SendCmd("page main");
+        TJC_SendCmd("page main");
       #endif
 
       queue.enqueue_now_P(PSTR("M84"));
@@ -2005,12 +2005,12 @@
           if(CardReader::flag.mounted)
           {
             RTS_SndData(ExchangePageBase + 2, ExchangepageAddr);
-            TJS_SendCmd("page file1");
+            TJC_SendCmd("page file1");
           }
           else
           {
             RTS_SndData(ExchangePageBase + 47, ExchangepageAddr);
-            TJS_SendCmd("page nosdcard");
+            TJC_SendCmd("page nosdcard");
           }
         }
         else if(recdat.data[0] == 2)
@@ -2127,9 +2127,9 @@
 
           #if ENABLED(TJC_AVAILABLE)
             temp_ctrl = 1;
-            TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));
-            TJS_SendCmd("adjusttemp.va0.val=1");  //默认为喷头界面
-            TJS_SendCmd("adjusttemp.va1.val=3");  //默认单位调整为10
+            TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));
+            TJC_SendCmd("adjusttemp.va0.val=1");  //默认为喷头界面
+            TJC_SendCmd("adjusttemp.va1.val=3");  //默认单位调整为10
           #endif 
 
         }
@@ -2138,17 +2138,17 @@
           if(printingIsPaused())
           {
             RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
           else if(printJobOngoing())
           {
             RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
           else
           {
             RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
         }
         else if(recdat.data[0] == 3)
@@ -2191,7 +2191,7 @@
           RTS_SndData(0, ICON_ADJUST_PRINTING_EXTRUDER_OR_BED); //默认为喷头界面
           RTS_SndData(2, ICON_ADJUST_PRINTING_TEMP_UNIT);       //默认单位调整为10
           RTS_SndData(ExchangePageBase + 16, ExchangepageAddr);
-          TJS_SendCmd("page adjusttemp");
+          TJC_SendCmd("page adjusttemp");
         }
         else if(recdat.data[0] == 6)
         {
@@ -2201,24 +2201,24 @@
           RTS_SndData(0, ICON_ADJUST_PRINTING_SPEED_FLOW); //默认为速度调整界面
           RTS_SndData(2, ICON_ADJUST_PRINTING_S_F_UNIT);   //默认单位调整为10
           RTS_SndData(ExchangePageBase + 17, ExchangepageAddr);
-          TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
-          TJS_SendCmd("page adjustspeed");
+          TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+          TJC_SendCmd("page adjustspeed");
         }
         else if(recdat.data[0] == 7)
         {
           zoffset_unit = 0.1;
-          TJS_SendCmd("adjustzoffset.zoffset_value.val=2");
+          TJC_SendCmd("adjustzoffset.zoffset_value.val=2");
           RTS_SndData(1, ICON_ADJUST_Z_OFFSET_UNIT); //默认单位为0.1mm
           RTS_SndData(1, ICON_LEVEL_SELECT);         //默认单位为0.1mm
           RTS_SndData(ExchangePageBase + 18, ExchangepageAddr);
-          TJS_SendCmd("adjustzoffset.z_offset.val=%d", (int)(probe.offset.z * 100));
-          TJS_SendCmd("page adjustzoffset");
+          TJC_SendCmd("adjustzoffset.z_offset.val=%d", (int)(probe.offset.z * 100));
+          TJC_SendCmd("page adjustzoffset");
         }
         else if(recdat.data[0] == 8)
         {
           #if ENABLED(TJC_AVAILABLE) 
             feedrate_percentage = 100;
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
           #endif
         }
         else if(recdat.data[0] == 9)
@@ -2226,13 +2226,13 @@
           #if ENABLED(TJC_AVAILABLE)
             planner.flow_percentage[0] = 100; 
             planner.refresh_e_factor(0);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
           #endif   
         }
         else if(recdat.data[0] == 0x0A)
         {
           thermalManager.fan_speed[0] = 255;
-          TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));         
+          TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));         
         }
                 
       }
@@ -2252,7 +2252,7 @@
           if(!Home_stop_flag)
           {
             RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-            TJS_SendCmd("page wait");
+            TJC_SendCmd("page wait");
 
             RTS_SndData(0, PRINT_TIME_HOUR_VP);
             RTS_SndData(0, PRINT_TIME_MIN_VP);
@@ -2267,17 +2267,17 @@
           if(card.isPrinting)
           {
             RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
           else if(sdcard_pause_check == false)
           {
             RTS_SndData(ExchangePageBase + 12, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
           else
           {
             RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
         }
       }
@@ -2292,9 +2292,9 @@
         else if(recdat.data[0] == 0xF1)
         {
           restFlag1 = 1;
-          TJS_SendCmd("restFlag1=1");
+          TJC_SendCmd("restFlag1=1");
           RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-          TJS_SendCmd("page wait");
+          TJC_SendCmd("page wait");
 
           //reject to receive cmd
           waitway = 1;
@@ -2316,7 +2316,7 @@
         {
           if(IS_SD_PRINTING())
           {
-            TJS_SendCmd("page pauseconfirm");
+            TJC_SendCmd("page pauseconfirm");
           }
         }
       }
@@ -2367,9 +2367,9 @@
           }
 
           restFlag1 = 0;
-          TJS_SendCmd("restFlag1=0");
+          TJC_SendCmd("restFlag1=0");
           RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-          TJS_SendCmd("page wait");
+          TJC_SendCmd("page wait");
 
           //char pause_str_Z[16];
           //char pause_str_E[16];
@@ -2404,7 +2404,7 @@
           sdcard_pause_check = true;
 
           RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
-          TJS_SendCmd("page printpause");
+          TJC_SendCmd("page printpause");
           }
           else if(recdat.data[0] == 2)
           {
@@ -2439,7 +2439,7 @@
                     print_job_timer.stop();
 
                     RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
-                    TJS_SendCmd("page printpause");
+                    TJC_SendCmd("page printpause");
 
                     if((0 == save_dual_x_carriage_mode) && (thermalManager.temp_hotend[0].target <= 175))
                     {
@@ -2467,7 +2467,7 @@
                   else
                   {
                     RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-                    TJS_SendCmd("page wait");
+                    TJC_SendCmd("page wait");
 
                     //char pause_str_Z[16];
                     //char pause_str_E[16];
@@ -2493,7 +2493,7 @@
                     Update_Time_Value = 0;
                     sdcard_pause_check = true;
                     RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
-                    TJS_SendCmd("page printpause");
+                    TJC_SendCmd("page printpause");
                   }
                 }
             #endif
@@ -2549,7 +2549,7 @@
             }
             RTS_M600_Flag = false;
             RTS_SndData(ExchangePageBase + 8, ExchangepageAddr);
-            TJS_SendCmd("page filamentresume");
+            TJC_SendCmd("page filamentresume");
           }
           else if(PoweroffContinue == false)
           {
@@ -2591,9 +2591,9 @@
               *c = tolower(*c);
 
             #if ENABLED(TJC_AVAILABLE)
-              TJS_SendCmd("page printpause");
+              TJC_SendCmd("page printpause");
               restFlag2 = 0;
-              TJS_SendCmd("restFlag2=0");
+              TJC_SendCmd("restFlag2=0");
               pause_count_pos = 0;
             #endif
 
@@ -2613,18 +2613,18 @@
             delay(2);
             #if ENABLED(BABYSTEPPING)
               RTS_SndData(0, AUTO_BED_LEVEL_ZOFFSET_VP);
-              TJS_SendCmd("leveldata.z_offset.val=%d", 0);
+              TJC_SendCmd("leveldata.z_offset.val=%d", 0);
             #endif
             feedrate_percentage = 100;
             RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
             zprobe_zoffset = last_zoffset;
             RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-            TJS_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
+            TJC_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
             PoweroffContinue = true;
 
             RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
             // #if ENABLED(TJC_AVAILABLE)
-            //   TJS_SendCmd("page printpause");
+            //   TJC_SendCmd("page printpause");
             // #endif
 
             sdcard_pause_check = true;
@@ -2642,7 +2642,7 @@
           else
           {
             RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-            TJS_SendCmd("page wait");
+            TJC_SendCmd("page wait");
             //char pause_str_Z[16];
             //char pause_str_E[16];
             //memset(pause_str_Z, 0, sizeof(pause_str_Z));
@@ -2664,7 +2664,7 @@
             sdcard_pause_check = true;
             sd_printing_autopause = false;
             RTS_SndData(ExchangePageBase + 11, ExchangepageAddr);
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
           }
         }
       }
@@ -2702,7 +2702,7 @@
           RTS_SndData(0, ICON_ADJUST_PRINTING_EXTRUDER_OR_BED);
           RTS_SndData(thermalManager.temp_hotend[0].target, SPEED_SET_VP);
           RTS_SndData(thermalManager.temp_hotend[0].target, HEAD0_SET_TEMP_VP);
-          TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));   
+          TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));   
         }
         else if (recdat.data[0] == 2)
         {
@@ -2713,7 +2713,7 @@
           temp_ctrl = 0; 
           RTS_SndData(1, ICON_ADJUST_PRINTING_EXTRUDER_OR_BED);
           RTS_SndData(thermalManager.temp_bed.target, SPEED_SET_VP);
-          TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_bed.target));
+          TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_bed.target));
         }
         else if (recdat.data[0] == 4)
         {
@@ -2764,7 +2764,7 @@
             thermalManager.setTargetHotend(thermalManager.temp_hotend[0].target, 0);
             RTS_SndData(thermalManager.temp_hotend[0].target, HEAD0_SET_TEMP_VP);
             RTS_SndData(thermalManager.temp_hotend[0].target, SPEED_SET_VP);
-            TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));
+            TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));
           }
           else
           {
@@ -2779,7 +2779,7 @@
               RTS_SndData(thermalManager.temp_bed.target, BED_SET_TEMP_VP);
               RTS_SndData(thermalManager.temp_bed.target, SPEED_SET_VP);
             }
-            TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_bed.target));
+            TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_bed.target));
           }
         }
         else if (recdat.data[0] == 9)  //--温度
@@ -2793,7 +2793,7 @@
               RTS_SndData(thermalManager.temp_hotend[0].target, HEAD0_SET_TEMP_VP);
               RTS_SndData(thermalManager.temp_hotend[0].target, SPEED_SET_VP);
             }
-            TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));
+            TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_hotend[0].target));
           }
           else
           {
@@ -2804,7 +2804,7 @@
               RTS_SndData(thermalManager.temp_bed.target, BED_SET_TEMP_VP);
               RTS_SndData(thermalManager.temp_bed.target, SPEED_SET_VP);
             }
-            TJS_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_bed.target));
+            TJC_SendCmd("adjusttemp.targettemp.val=%d", (int)(thermalManager.temp_bed.target));
           }
         }
         else if(recdat.data[0] == 0x0A)
@@ -2812,21 +2812,21 @@
           RTS_SndData(0, ICON_ADJUST_PRINTING_SPEED_FLOW);
           RTS_SndData(feedrate_percentage, SPEED_SET_VP);
           speed_ctrl = 1;
-          TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+          TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
         } 
         else if(recdat.data[0] == 0x0B)
         {
           RTS_SndData(1, ICON_ADJUST_PRINTING_SPEED_FLOW);
           RTS_SndData(planner.flow_percentage[0], SPEED_SET_VP);
           speed_ctrl = 2;
-          TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
+          TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
         }
         else if(recdat.data[0] == 0x0C)
         {
           RTS_SndData(2, ICON_ADJUST_PRINTING_SPEED_FLOW);
           RTS_SndData(thermalManager.fan_speed[0], SPEED_SET_VP);
           speed_ctrl = 3;
-          TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));
+          TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));
         }
         else if(recdat.data[0] == 0x0D)
         {
@@ -2841,7 +2841,7 @@
               feedrate_percentage = (feedrate_percentage + unit);
             }
             RTS_SndData(feedrate_percentage, SPEED_SET_VP);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
           }
           else if(speed_ctrl==2)
           {
@@ -2855,7 +2855,7 @@
             }
             planner.refresh_e_factor(0);
             RTS_SndData(planner.flow_percentage[0], SPEED_SET_VP);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));
           }
           else if(speed_ctrl==3)
           {
@@ -2869,7 +2869,7 @@
             }
             thermalManager.set_fan_speed(0, thermalManager.fan_speed[0]);
             RTS_SndData(thermalManager.fan_speed[0], SPEED_SET_VP);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));
           }
         }
         else if(recdat.data[0] == 0x0E)
@@ -2885,7 +2885,7 @@
               feedrate_percentage = (feedrate_percentage - unit);
             }
             RTS_SndData(feedrate_percentage, SPEED_SET_VP);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(feedrate_percentage));
           }
           else if(speed_ctrl==2)
           {
@@ -2899,7 +2899,7 @@
             }
             planner.refresh_e_factor(0);
             RTS_SndData(planner.flow_percentage[0], SPEED_SET_VP);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));           
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(planner.flow_percentage[0]));           
           }
           else if(speed_ctrl==3)
           {
@@ -2913,7 +2913,7 @@
             }
             thermalManager.set_fan_speed(0, thermalManager.fan_speed[0]);
             RTS_SndData(thermalManager.fan_speed[0], SPEED_SET_VP);
-            TJS_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));
+            TJC_SendCmd("adjustspeed.targetspeed.val=%d", (int)(thermalManager.fan_speed[0]));
           }
         }
         else if(recdat.data[0] == 0x0F) //最大加速度
@@ -3129,17 +3129,17 @@
 
         if(advaned_set==1)
         {
-          TJS_SendCmd("speedsetvalue.xaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[X_AXIS]));
-          TJS_SendCmd("speedsetvalue.yaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[Y_AXIS]));
-          TJS_SendCmd("speedsetvalue.zaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[Z_AXIS]));
-          TJS_SendCmd("speedsetvalue.eaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[E_AXIS_N(0)]));
+          TJC_SendCmd("speedsetvalue.xaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[X_AXIS]));
+          TJC_SendCmd("speedsetvalue.yaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[Y_AXIS]));
+          TJC_SendCmd("speedsetvalue.zaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[Z_AXIS]));
+          TJC_SendCmd("speedsetvalue.eaxis.val=%d", (int)(planner.settings.max_feedrate_mm_s[E_AXIS_N(0)]));
         }
         else if(advaned_set==2)
         {
-          TJS_SendCmd("speedsetvalue.xaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[X_AXIS]));
-          TJS_SendCmd("speedsetvalue.yaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[Y_AXIS]));
-          TJS_SendCmd("speedsetvalue.zaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[Z_AXIS]));
-          TJS_SendCmd("speedsetvalue.eaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(0)]));
+          TJC_SendCmd("speedsetvalue.xaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[X_AXIS]));
+          TJC_SendCmd("speedsetvalue.yaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[Y_AXIS]));
+          TJC_SendCmd("speedsetvalue.zaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[Z_AXIS]));
+          TJC_SendCmd("speedsetvalue.eaxis.val=%d", (int)(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(0)]));
         }
       }
       break;
@@ -3155,16 +3155,16 @@
           RTS_SndData(0, HEAD0_SET_TEMP_VP);
           RTS_SndData(0, HEAD0_FAN_ICON_VP);
           //pretemp
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
         }
         else if (recdat.data[0] == 2)
         {
           thermalManager.setTargetBed(0);
           RTS_SndData(0, BED_SET_TEMP_VP);
           //pretemp
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
         }
         else if (recdat.data[0] == 3)
         {
@@ -3232,10 +3232,10 @@
           thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
           thermalManager.setTargetBed(bed_temp);
           //pretemp
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
-          TJS_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
         }
         else if(recdat.data[0] == 10) //预热ABS
         {
@@ -3246,10 +3246,10 @@
           thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
           thermalManager.setTargetBed(bed_temp);
           //pretemp
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
-          TJS_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
         }
         else if(recdat.data[0] == 11) //预热PETG
         {
@@ -3260,10 +3260,10 @@
           thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
           thermalManager.setTargetBed(bed_temp);
           //pretemp
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
-          TJS_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
         }
         else if(recdat.data[0] == 12) //预热TPU
         {
@@ -3274,10 +3274,10 @@
           thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
           thermalManager.setTargetBed(bed_temp);
           //pretemp
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
-          TJS_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
-          TJS_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.nozzle.txt=\"%d\"",thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.bed.txt=\"%d\"", thermalManager.degTargetBed());
         }
         else if(recdat.data[0] == 13) //显示默认PLA温度
         {
@@ -3288,9 +3288,9 @@
 
           #if ENABLED(TJC_AVAILABLE)
             unit = 10;
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)pla_extrusion_temp);
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", pla_bed_temp);
-            TJS_SendCmd("page tempsetvalue");
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)pla_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", pla_bed_temp);
+            TJC_SendCmd("page tempsetvalue");
           #endif 
         }
         else if(recdat.data[0] == 14) //显示默认PETG温度
@@ -3302,9 +3302,9 @@
 
           #if ENABLED(TJC_AVAILABLE)
             unit = 10;
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)petg_extrusion_temp);
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", petg_bed_temp);
-            TJS_SendCmd("page tempsetvalue");
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)petg_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", petg_bed_temp);
+            TJC_SendCmd("page tempsetvalue");
           #endif 
         }
         else if(recdat.data[0] == 15) //显示默认ABS温度
@@ -3316,9 +3316,9 @@
 
           #if ENABLED(TJC_AVAILABLE)
             unit = 10;
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)abs_extrusion_temp);
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", abs_bed_temp);
-            TJS_SendCmd("page tempsetvalue");
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)abs_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", abs_bed_temp);
+            TJC_SendCmd("page tempsetvalue");
           #endif 
         }
         else if(recdat.data[0] == 16) //显示默认TPU温度
@@ -3330,9 +3330,9 @@
 
           #if ENABLED(TJC_AVAILABLE)
             unit = 10;
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)tpu_extrusion_temp);
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", tpu_bed_temp);
-            TJS_SendCmd("page tempsetvalue");
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)tpu_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", tpu_bed_temp);
+            TJC_SendCmd("page tempsetvalue");
           #endif 
         }
         else if(recdat.data[0] == 17) //默认调平温度
@@ -3344,9 +3344,9 @@
 
           #if ENABLED(TJC_AVAILABLE)
             unit = 10;
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)probe_extrusion_temp);
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", probe_bed_temp);
-            TJS_SendCmd("page tempsetvalue");
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)probe_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", probe_bed_temp);
+            TJC_SendCmd("page tempsetvalue");
           #endif
         }
 
@@ -3358,7 +3358,7 @@
         #if ENABLED(TJC_AVAILABLE)
           thermalManager.temp_hotend[0].target = ( ((recdat.data[0] & 0xFF00) >> 8) | ((recdat.data[0] & 0x00FF)<<8));
           thermalManager.setTargetHotend(thermalManager.temp_hotend[0].target, 0);
-          TJS_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("pretemp.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
         #else
           thermalManager.temp_hotend[0].target = recdat.data[0];
           thermalManager.setTargetHotend(thermalManager.temp_hotend[0].target, 0);
@@ -3382,7 +3382,7 @@
         #if ENABLED(TJC_AVAILABLE)
           thermalManager.temp_bed.target = ( ((recdat.data[0] & 0xFF00) >> 8) | ((recdat.data[0] & 0x00FF)<<8));
           thermalManager.setTargetBed(thermalManager.temp_bed.target);
-          TJS_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("pretemp.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
         #else
           thermalManager.temp_bed.target = recdat.data[0];
           thermalManager.setTargetBed(thermalManager.temp_bed.target);
@@ -3412,7 +3412,7 @@
                 pla_extrusion_temp = 160;
               }        
             }
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)pla_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)pla_extrusion_temp);
           #else
             pla_extrusion_temp = recdat.data[0];
             RTS_SndData(pla_extrusion_temp, PRHEAT_NOZZLE_TEMP_VP);
@@ -3438,7 +3438,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)petg_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)petg_extrusion_temp);
           #else
             petg_extrusion_temp = recdat.data[0];
             RTS_SndData(petg_extrusion_temp, PRHEAT_NOZZLE_TEMP_VP);
@@ -3464,7 +3464,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)abs_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)abs_extrusion_temp);
           #else
             abs_extrusion_temp = recdat.data[0];
             RTS_SndData(abs_extrusion_temp, PRHEAT_NOZZLE_TEMP_VP);
@@ -3490,7 +3490,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)tpu_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)tpu_extrusion_temp);
           #else
             tpu_extrusion_temp = recdat.data[0];
             RTS_SndData(tpu_extrusion_temp, PRHEAT_NOZZLE_TEMP_VP); 
@@ -3516,7 +3516,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)probe_extrusion_temp);
+            TJC_SendCmd("tempsetvalue.nozzletemp.val=%d", (int)probe_extrusion_temp);
           #else
             probe_extrusion_temp = recdat.data[0];
             RTS_SndData(probe_extrusion_temp, PRHEAT_NOZZLE_TEMP_VP); 
@@ -3547,7 +3547,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", (int)pla_bed_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", (int)pla_bed_temp);
           #else
             pla_bed_temp = recdat.data[0];
             RTS_SndData(pla_bed_temp, PRHEAT_BED_TEMP_VP);
@@ -3573,7 +3573,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", (int)petg_bed_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", (int)petg_bed_temp);
           #else
             petg_bed_temp = recdat.data[0];
             RTS_SndData(petg_bed_temp, PRHEAT_BED_TEMP_VP);
@@ -3599,7 +3599,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", (int)abs_bed_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", (int)abs_bed_temp);
           #else
             abs_bed_temp = recdat.data[0];
             RTS_SndData(abs_bed_temp, PRHEAT_BED_TEMP_VP);
@@ -3625,7 +3625,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", (int)tpu_bed_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", (int)tpu_bed_temp);
           #else
             tpu_bed_temp = recdat.data[0];
             RTS_SndData(tpu_bed_temp, PRHEAT_BED_TEMP_VP); 
@@ -3651,7 +3651,7 @@
               }        
             }
 
-            TJS_SendCmd("tempsetvalue.bedtemp.val=%d", (int)probe_bed_temp);
+            TJC_SendCmd("tempsetvalue.bedtemp.val=%d", (int)probe_bed_temp);
           #else
             probe_bed_temp = recdat.data[0];
             RTS_SndData(probe_bed_temp, PRHEAT_BED_TEMP_VP); 
@@ -3664,7 +3664,7 @@
       {
         #if ENABLED(TJC_AVAILABLE)
           Filament0LOAD = ( ((recdat.data[0] & 0xFF00) >> 8) | ((recdat.data[0] & 0x00FF)<<8));
-          TJS_SendCmd("prefilament.filamentlength.txt=\"%d\"", (int)Filament0LOAD);
+          TJC_SendCmd("prefilament.filamentlength.txt=\"%d\"", (int)Filament0LOAD);
         #else
           Filament0LOAD = ((float)recdat.data[0]) / 10;
         #endif
@@ -3679,7 +3679,7 @@
 
         #if ENABLED(TJC_AVAILABLE)
           manual_feedrate_mm_m[E_AXIS] = ( ((recdat.data[0] & 0xFF00) >> 8) | ((recdat.data[0] & 0x00FF)<<8));
-          TJS_SendCmd("prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m[E_AXIS]);
+          TJC_SendCmd("prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m[E_AXIS]);
         #else
           manual_feedrate_mm_m[E_AXIS] = ((float)recdat.data[0] / 10);
         #endif
@@ -3804,7 +3804,7 @@
           Update_Time_Value = 0;
           RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
           RTS_SndData(0, MOTOR_FREE_ICON_VP);
-          TJS_SendCmd("page autohome");
+          TJC_SendCmd("page autohome");
         }
         else if(recdat.data[0] == 5)
         {
@@ -3837,13 +3837,13 @@
           queue.enqueue_now_P(PSTR("G28"));
           queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
           RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
-          TJS_SendCmd("page autohome");
+          TJC_SendCmd("page autohome");
           #if ENABLED(NEPTUNE_3_PLUS)
-            TJS_SendCmd("leveling.va1.val=2");
+            TJC_SendCmd("leveling.va1.val=2");
           #elif ENABLED(NEPTUNE_3_PRO)
-            TJS_SendCmd("leveling.va1.val=1");
+            TJC_SendCmd("leveling.va1.val=1");
           #elif ENABLED(NEPTUNE_3_MAX)
-            TJS_SendCmd("leveling.va1.val=3");
+            TJC_SendCmd("leveling.va1.val=3");
           #endif
 
           if (active_extruder == 0)
@@ -3877,13 +3877,13 @@
           delay(2);
           //RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
           RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
-          TJS_SendCmd("page autohome");
+          TJC_SendCmd("page autohome");
         }
         else if (recdat.data[0] == 3)
         {
           // #if ENABLED(TJC_AVAILABLE) 
-          //   TJS_SendCmd("page premove");
-          //   TJS_SendCmd("premove.unit_move.val=2"); //默认移动单位1mm
+          //   TJC_SendCmd("page premove");
+          //   TJC_SendCmd("premove.unit_move.val=2"); //默认移动单位1mm
           // #endif
         
           // if(active_extruder == 0)
@@ -3956,13 +3956,13 @@
           {
             RTS_SndData(1, HEAD0_FAN_ICON_VP);
             thermalManager.set_fan_speed(0, 0);
-            TJS_SendCmd("set.va0.val=0");
+            TJC_SendCmd("set.va0.val=0");
           }
           else
           {
             RTS_SndData(0, HEAD0_FAN_ICON_VP);
             thermalManager.set_fan_speed(0, 255);
-            TJS_SendCmd("set.va0.val=1");
+            TJC_SendCmd("set.va0.val=1");
           }  
         }
         else if(recdat.data[0] == 8)
@@ -3970,27 +3970,27 @@
           if(enable_filment_check)
           {
             enable_filment_check = false;
-            TJS_SendCmd("set.va1.val=0");
+            TJC_SendCmd("set.va1.val=0");
           }
           else
           {
             enable_filment_check = true;
-            TJS_SendCmd("set.va1.val=1");            
+            TJC_SendCmd("set.va1.val=1");            
           }
         }
         else if(recdat.data[0] == 9)
         {
           RTS_SndData(ExchangePageBase + 30, ExchangepageAddr);
-          TJS_SendCmd("page pretemp");
+          TJC_SendCmd("page pretemp");
 
           if(thermalManager.wholeDegHotend(0) < 0)
           {
-            TJS_SendCmd("page err_nozzleunde");
+            TJC_SendCmd("page err_nozzleunde");
             break;
           }
           else if(thermalManager.wholeDegBed() < 0)
           {
-            TJS_SendCmd("page err_bedunder");
+            TJC_SendCmd("page err_bedunder");
             break;
           }          
 
@@ -3998,23 +3998,23 @@
         else if(recdat.data[0] == 0x0A)
         {
           RTS_SndData(ExchangePageBase + 31, ExchangepageAddr);
-          TJS_SendCmd("page prefilament");
-          TJS_SendCmd("prefilament.filamentlength.txt=\"%d\"", (int)Filament0LOAD);
-          TJS_SendCmd("prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m[E_AXIS]);
+          TJC_SendCmd("page prefilament");
+          TJC_SendCmd("prefilament.filamentlength.txt=\"%d\"", (int)Filament0LOAD);
+          TJC_SendCmd("prefilament.filamentspeed.txt=\"%d\"", (int)manual_feedrate_mm_m[E_AXIS]);
         }
         else if(recdat.data[0] == 0x0B)
         {
-          // TJS_SendCmd("page set");
+          // TJC_SendCmd("page set");
         }
         else if(recdat.data[0] == 0x0C)
         {
-          // TJS_SendCmd("page warn_rdlevel");
+          // TJC_SendCmd("page warn_rdlevel");
         }
         else if(recdat.data[0] == 0x0D)
         {
         #if ENABLED(POWER_LOSS_RECOVERY)
-          TJS_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
-          TJS_SendCmd("page multiset");
+          TJC_SendCmd("multiset.plrbutton.val=%d", recovery.enabled);
+          TJC_SendCmd("page multiset");
         #endif
         }
         
@@ -4108,7 +4108,7 @@
             active_extruder_font = active_extruder;
             queue.enqueue_now_P(PSTR("G28"));
             RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
-            TJS_SendCmd("page autohome");
+            TJC_SendCmd("page autohome");
           }
           else
           #endif
@@ -4134,8 +4134,8 @@
               #endif
             }
             RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-            TJS_SendCmd("leveldata.z_offset.val=%d", (int)(probe.offset.z * 100));
-            TJS_SendCmd("adjustzoffset.z_offset.val=%d", (int)(probe.offset.z * 100));
+            TJC_SendCmd("leveldata.z_offset.val=%d", (int)(probe.offset.z * 100));
+            TJC_SendCmd("adjustzoffset.z_offset.val=%d", (int)(probe.offset.z * 100));
           #endif
         }
         else if (recdat.data[0] == 3)
@@ -4151,8 +4151,8 @@
               #endif
             }
             RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-            TJS_SendCmd("leveldata.z_offset.val=%d", (int)(probe.offset.z * 100));
-            TJS_SendCmd("adjustzoffset.z_offset.val=%d", (int)(probe.offset.z * 100));
+            TJC_SendCmd("leveldata.z_offset.val=%d", (int)(probe.offset.z * 100));
+            TJC_SendCmd("adjustzoffset.z_offset.val=%d", (int)(probe.offset.z * 100));
           #endif
         }
         else if (recdat.data[0] == 4)
@@ -4160,21 +4160,21 @@
           RTS_SndData(0, ICON_ADJUST_Z_OFFSET_UNIT);
           RTS_SndData(0, ICON_LEVEL_SELECT);
           zoffset_unit = 0.01;
-          TJS_SendCmd("adjustzoffset.zoffset_value.val=1");
+          TJC_SendCmd("adjustzoffset.zoffset_value.val=1");
         }
         else if (recdat.data[0] == 5)
         {
           RTS_SndData(1, ICON_ADJUST_Z_OFFSET_UNIT);
           RTS_SndData(1, ICON_LEVEL_SELECT);
           zoffset_unit = 0.1;
-          TJS_SendCmd("adjustzoffset.zoffset_value.val=2");
+          TJC_SendCmd("adjustzoffset.zoffset_value.val=2");
         }
         else if (recdat.data[0] == 6)
         {
           RTS_SndData(2, ICON_ADJUST_Z_OFFSET_UNIT);
           RTS_SndData(2, ICON_LEVEL_SELECT);
           zoffset_unit = 1;
-          TJS_SendCmd("adjustzoffset.zoffset_value.val=3");
+          TJC_SendCmd("adjustzoffset.zoffset_value.val=3");
         }
         else if (recdat.data[0] == 7) //LED2
         {
@@ -4183,7 +4183,7 @@
             //关LED
             status_led1 = false;
             RTS_SndData(1, ICON_ADJUST_LED2);
-            TJS_SendCmd("status_led1=0");
+            TJC_SendCmd("status_led1=0");
             #if PIN_EXISTS(LED2)
               OUT_WRITE(LED2_PIN, LOW);
             #endif
@@ -4193,7 +4193,7 @@
             //开LED
             status_led1 = true;
             RTS_SndData(0, ICON_ADJUST_LED2);
-            TJS_SendCmd("status_led1=1");
+            TJC_SendCmd("status_led1=1");
             #if PIN_EXISTS(LED2)
               OUT_WRITE(LED2_PIN, HIGH);
             #endif
@@ -4206,7 +4206,7 @@
           {
             status_led2 = false;
             RTS_SndData(1, ICON_ADJUST_LED3);
-            TJS_SendCmd("status_led2=0");
+            TJC_SendCmd("status_led2=0");
             #if PIN_EXISTS(LED3)
               OUT_WRITE(LED3_PIN, LOW);
             #endif
@@ -4215,7 +4215,7 @@
           {
             status_led2 = true;
             RTS_SndData(0, ICON_ADJUST_LED3);
-            TJS_SendCmd("status_led2=1");
+            TJC_SendCmd("status_led2=1");
             #if PIN_EXISTS(LED3)
               OUT_WRITE(LED3_PIN, HIGH);
             #endif
@@ -4234,13 +4234,13 @@
         else if (recdat.data[0] == 10) //更新PRINTPAUSE上的一些信息 0x0A
         {
           //printspeed
-          TJS_SendCmd("printpause.printspeed.txt=\"%d\"", feedrate_percentage );
+          TJC_SendCmd("printpause.printspeed.txt=\"%d\"", feedrate_percentage );
           //printtime
           #if ENABLED(RTS_AVAILABLE) 
             duration_t elapsed = print_job_timer.duration();
             rtscheck.RTS_SndData(elapsed.value / 3600, PRINT_TIME_HOUR_VP);
             rtscheck.RTS_SndData((elapsed.value % 3600) / 60, PRINT_TIME_MIN_VP);
-            TJS_SendCmd("printpause.printtime.txt=\"%d h %d min\"", (int)elapsed.value/3600,(int)(elapsed.value % 3600)/60);
+            TJC_SendCmd("printpause.printtime.txt=\"%d h %d min\"", (int)elapsed.value/3600,(int)(elapsed.value % 3600)/60);
           #endif
 
           //printpercent
@@ -4253,8 +4253,8 @@
               {
                 #if ENABLED(RTS_AVAILABLE) 
                   rtscheck.RTS_SndData((unsigned char)Percentrecord, PRINT_PROCESS_ICON_VP);
-                  TJS_SendCmd("printpause.printprocess.val=%d", Percentrecord);
-                  TJS_SendCmd("printpause.printvalue.txt=\"%d\"", Percentrecord);
+                  TJC_SendCmd("printpause.printprocess.val=%d", Percentrecord);
+                  TJC_SendCmd("printpause.printvalue.txt=\"%d\"", Percentrecord);
                 #endif
               }
             }
@@ -4264,8 +4264,8 @@
                 rtscheck.RTS_SndData(0, PRINT_PROCESS_ICON_VP);
                 rtscheck.RTS_SndData(0, PRINT_SURPLUS_TIME_HOUR_VP);
                 rtscheck.RTS_SndData(0, PRINT_SURPLUS_TIME_MIN_VP);
-                TJS_SendCmd("printpause.printvalue.txt=\"0\""); 
-                TJS_SendCmd("printpause.printprocess.val=0"); 
+                TJC_SendCmd("printpause.printvalue.txt=\"0\""); 
+                TJC_SendCmd("printpause.printprocess.val=0"); 
               #endif
             }
 
@@ -4275,25 +4275,25 @@
         else if(recdat.data[0] == 11)  //0x0B
         {
           //挤出头温度信息
-          TJS_SendCmd("main.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
+          TJC_SendCmd("main.nozzletemp.txt=\"%d / %d\"", thermalManager.wholeDegHotend(0) , thermalManager.degTargetHotend(0));
           //热床温度信息
-          TJS_SendCmd("main.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
+          TJC_SendCmd("main.bedtemp.txt=\"%d / %d\"", thermalManager.wholeDegBed() , thermalManager.degTargetBed());
         }
         else if(recdat.data[0] == 12)  //0x0C
         {
           if(!flag_power_on) //已开机
           {
             //boot提示信息 
-            TJS_SendCmd("tm0.en=0");
-            TJS_SendCmd("va0.val=0");
-            TJS_SendCmd("tm1.en=1");
+            TJC_SendCmd("tm0.en=0");
+            TJC_SendCmd("va0.val=0");
+            TJC_SendCmd("tm1.en=1");
             //机型信息
             #if ENABLED(NEPTUNE_3_PLUS)
-              TJS_SendCmd("main.va0.val=2");
+              TJC_SendCmd("main.va0.val=2");
             #elif ENABLED(NEPTUNE_3_PRO)
-              TJS_SendCmd("main.va0.val=1");  
+              TJC_SendCmd("main.va0.val=1");  
             #elif ENABLED(NEPTUNE_3_MAX)
-              TJS_SendCmd("main.va0.val=3");  
+              TJC_SendCmd("main.va0.val=3");  
             #endif
           }
         }
@@ -4468,27 +4468,27 @@
         else if(recdat.data[0] == 0x16) //printpause恢复页面后获取一次信息
         {
           //暂停打印按钮激活功能
-          TJS_SendCmd("restFlag1=%d", restFlag1);
-          TJS_SendCmd("restFlag2=%d", restFlag2);
+          TJC_SendCmd("restFlag1=%d", restFlag1);
+          TJC_SendCmd("restFlag2=%d", restFlag2);
           //机型信息
           #if ENABLED(NEPTUNE_3_PLUS)
-            TJS_SendCmd("main.va0.val=2");  
+            TJC_SendCmd("main.va0.val=2");  
           #elif ENABLED(NEPTUNE_3_PRO)
-            TJS_SendCmd("main.va0.val=1");  
+            TJC_SendCmd("main.va0.val=1");  
           #elif ENABLED(NEPTUNE_3_MAX)
-            TJS_SendCmd("main.va0.val=3");  
+            TJC_SendCmd("main.va0.val=3");  
           #endif   
 
           //打印文件名
-          TJS_SendCmd("printpause.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
+          TJC_SendCmd("printpause.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
           //打印百分比
           Percentrecord = card.percentDone();
           if(Percentrecord <= 100)
           {
             #if ENABLED(RTS_AVAILABLE) 
               rtscheck.RTS_SndData((unsigned char)Percentrecord, PRINT_PROCESS_ICON_VP);
-              TJS_SendCmd("printpause.printprocess.val=%d", Percentrecord);
-              TJS_SendCmd("printpause.printvalue.txt=\"%d\"", Percentrecord);
+              TJC_SendCmd("printpause.printprocess.val=%d", Percentrecord);
+              TJC_SendCmd("printpause.printvalue.txt=\"%d\"", Percentrecord);
             #endif
           }
         }
@@ -4766,7 +4766,7 @@
           if(printJobOngoing())
           {
             RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
-            TJS_SendCmd("page warn1_filament");
+            TJC_SendCmd("page warn1_filament");
             //222---
             //return;
           }
@@ -4780,7 +4780,7 @@
               //     if(0 == READ(CHECKFILEMENT0_PIN))
               //     {
               //       RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-              //       TJS_SendCmd("page nofilament");
+              //       TJC_SendCmd("page nofilament");
               //       #endif
               //     }
               //   #endif
@@ -4794,7 +4794,7 @@
               {
                 RTS_SndData((int)ChangeFilament0Temp, CHANGE_FILAMENT0_TEMP_VP);
                 RTS_SndData(ExchangePageBase + 24, ExchangepageAddr);
-                TJS_SendCmd("page warn2_filament");
+                TJC_SendCmd("page warn2_filament");
               }
               else
               {
@@ -4810,7 +4810,7 @@
           if(printJobOngoing())
           {
             RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
-            TJS_SendCmd("page warn1_filament");
+            TJC_SendCmd("page warn1_filament");
             //222---
             //return;
           }
@@ -4824,7 +4824,7 @@
               //     if(0 == READ(CHECKFILEMENT0_PIN))
               //     {
               //       RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-              //       TJS_SendCmd("page nofilament");
+              //       TJC_SendCmd("page nofilament");
               //       #endif
               //     }
               //   #endif
@@ -4837,7 +4837,7 @@
               {
                 RTS_SndData((int)ChangeFilament0Temp, CHANGE_FILAMENT0_TEMP_VP);
                 RTS_SndData(ExchangePageBase + 24, ExchangepageAddr);
-                TJS_SendCmd("page warn2_filament");
+                TJC_SendCmd("page warn2_filament");
                 //222---
                  //return; 
               }
@@ -4861,7 +4861,7 @@
             //       if(0 == READ(CHECKFILEMENT1_PIN))
             //       {
             //         RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-            //         TJS_SendCmd("page nofilament");
+            //         TJC_SendCmd("page nofilament");
             //       }
             //     #endif
             //   #endif
@@ -4897,7 +4897,7 @@
             //       if(0 == READ(CHECKFILEMENT1_PIN))
             //       {
             //         RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-            //         TJS_SendCmd("page nofilament");
+            //         TJC_SendCmd("page nofilament");
             //       }
             //     #endif
             //   #endif
@@ -4930,7 +4930,7 @@
             thermalManager.setTargetHotend(ChangeFilament0Temp, 0);
             RTS_SndData(ChangeFilament0Temp, HEAD0_SET_TEMP_VP);
             RTS_SndData(ExchangePageBase + 26, ExchangepageAddr);
-            TJS_SendCmd("page heatfilament");
+            TJC_SendCmd("page heatfilament");
             heatway = 1;
           }
         }
@@ -4944,7 +4944,7 @@
             RTS_SndData(10 * Filament1LOAD, HEAD1_FILAMENT_LOAD_DATA_VP);
             //RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
             RTS_SndData(ExchangePageBase + 31, ExchangepageAddr);
-            TJS_SendCmd("page prefilament");
+            TJC_SendCmd("page prefilament");
             heatway = 1;
           }
         }
@@ -4958,7 +4958,7 @@
             thermalManager.setTargetHotend(ChangeFilament1Temp, 1);
             RTS_SndData(ChangeFilament1Temp, HEAD1_SET_TEMP_VP);
             RTS_SndData(ExchangePageBase + 26, ExchangepageAddr);
-            TJS_SendCmd("page heatfilament");
+            TJC_SendCmd("page heatfilament");
             heatway = 2;
           }
         }
@@ -4977,7 +4977,7 @@
         else if(recdat.data[0] == 9)
         {
             RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-            TJS_SendCmd("page wait");
+            TJC_SendCmd("page wait");
             //reject to receive cmd
             waitway = 1;
             //222----
@@ -4996,13 +4996,13 @@
         {
           if(!planner.has_blocks_queued())
           {
-            TJS_SendCmd("page main");
+            TJC_SendCmd("page main");
           }
         }
         else if(recdat.data[0] == 0x0B)
         {
           #if ENABLED(TJC_AVAILABLE)
-            TJS_SendCmd("motorsetvalue.motorvalue.val=%d",(int)(planner.settings.axis_steps_per_mm[E_AXIS_N(0)]));
+            TJC_SendCmd("motorsetvalue.motorvalue.val=%d",(int)(planner.settings.axis_steps_per_mm[E_AXIS_N(0)]));
             unit = 10;   //默认调整单位
           #endif
         }
@@ -5010,7 +5010,7 @@
         {
           #if ENABLED(TJC_AVAILABLE)
             planner.settings.axis_steps_per_mm[E_AXIS_N(0)] = (planner.settings.axis_steps_per_mm[E_AXIS_N(0)] + unit);
-            TJS_SendCmd("motorsetvalue.motorvalue.val=%d",(int)(planner.settings.axis_steps_per_mm[E_AXIS_N(0)]));
+            TJC_SendCmd("motorsetvalue.motorvalue.val=%d",(int)(planner.settings.axis_steps_per_mm[E_AXIS_N(0)]));
           #endif
         }
         else if(recdat.data[0] == 0x0D)
@@ -5021,7 +5021,7 @@
             {
               planner.settings.axis_steps_per_mm[E_AXIS_N(0)] = 0;
             }
-            TJS_SendCmd("motorsetvalue.motorvalue.val=%d",(int)(planner.settings.axis_steps_per_mm[E_AXIS_N(0)]));
+            TJC_SendCmd("motorsetvalue.motorvalue.val=%d",(int)(planner.settings.axis_steps_per_mm[E_AXIS_N(0)]));
           #endif  
         }
         else if(recdat.data[0] == 0x0E)
@@ -5091,18 +5091,18 @@
                 if((0 == READ(CHECKFILEMENT0_PIN)) && (active_extruder == 0))
                 {
                   RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-                  TJS_SendCmd("page nofilament");
+                  TJC_SendCmd("page nofilament");
                 }
                 else if((0 == READ(CHECKFILEMENT1_PIN)) && (active_extruder == 1))
                 {
                   RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-                  TJS_SendCmd("page nofilament");
+                  TJC_SendCmd("page nofilament");
                 }
               #else
                 if(0 == READ(CHECKFILEMENT0_PIN))
                 {
                   RTS_SndData(ExchangePageBase + 20, ExchangepageAddr);
-                  TJS_SendCmd("page nofilament");
+                  TJC_SendCmd("page nofilament");
                 }
               #endif
                 else
@@ -5155,8 +5155,8 @@
               RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
               #if ENABLED(TJC_AVAILABLE)
                 restFlag2 = 0;
-                TJS_SendCmd("restFlag2=0");
-                TJS_SendCmd("page printpause");
+                TJC_SendCmd("restFlag2=0");
+                TJC_SendCmd("page printpause");
                 pause_count_pos = 0;
               #endif
 
@@ -5171,7 +5171,7 @@
               //zprobe_zoffset = probe.offset.z;
 
               RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-              TJS_SendCmd("leveldata.z_offset.val=%d",(int)(zprobe_zoffset * 100));
+              TJC_SendCmd("leveldata.z_offset.val=%d",(int)(zprobe_zoffset * 100));
               RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
             }
           #endif
@@ -5185,7 +5185,7 @@
             active_extruder = 0;
           #endif
           RTS_SndData(ExchangePageBase + 1, ExchangepageAddr);
-          TJS_SendCmd("page main");
+          TJC_SendCmd("page main");
           RTS_SndData(0, PRINT_TIME_HOUR_VP);
           RTS_SndData(0, PRINT_TIME_MIN_VP);
           RTS_SndData(0, PRINT_SURPLUS_TIME_HOUR_VP);
@@ -5201,12 +5201,12 @@
                 if(recovery.enabled==0)
                 { 
                   recovery.enable(true);
-                  TJS_SendCmd("multiset.plrbutton.val=1");
+                  TJC_SendCmd("multiset.plrbutton.val=1");
                 }
                 else if(recovery.enabled==1)
                 {
                   recovery.enable(false);
-                  TJS_SendCmd("multiset.plrbutton.val=0");
+                  TJC_SendCmd("multiset.plrbutton.val=0");
                 }
               #endif              
             #endif
@@ -5234,11 +5234,11 @@
           }
 
           //清标题
-          TJS_SendCmd("askprint.t0.txt=\"\"");
-          TJS_SendCmd("printpause.t0.txt=\"\"");
+          TJC_SendCmd("askprint.t0.txt=\"\"");
+          TJC_SendCmd("printpause.t0.txt=\"\"");
           RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], SELECT_FILE_TEXT_VP);
-          TJS_SendCmd("askprint.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
-          TJS_SendCmd("printpause.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
+          TJC_SendCmd("askprint.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
+          TJC_SendCmd("printpause.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
 
           delay(2);
           for(int j = 1;j <= CardRecbuf.Filesum;j ++)
@@ -5248,7 +5248,7 @@
           RTS_SndData((unsigned long)0x073F, FilenameNature + recdat.data[0] * 16);
           RTS_SndData(1, FILE1_SELECT_ICON_VP + (recdat.data[0] - 1));
           RTS_SndData(ExchangePageBase + 28, ExchangepageAddr);
-          TJS_SendCmd("page askprint");
+          TJC_SendCmd("page askprint");
           TJC_SendThumbnail("askprint");
         }
       }
@@ -5260,12 +5260,12 @@
         {
           if(thermalManager.wholeDegHotend(0) < 0)
           {
-            TJS_SendCmd("page err_nozzleunde");
+            TJC_SendCmd("page err_nozzleunde");
             break;
           }
           else if(thermalManager.wholeDegBed() < 0)
           {
-            TJS_SendCmd("page err_bedunder");
+            TJC_SendCmd("page err_bedunder");
             break;
           }  
 
@@ -5275,7 +5275,7 @@
           }
 
           //打印文件颜色显示
-          TJS_SendCmd("file%d.t%d.pco=65504", (CardRecbuf.recordcount/5) + 1 , CardRecbuf.recordcount);
+          TJC_SendCmd("file%d.t%d.pco=65504", (CardRecbuf.recordcount/5) + 1 , CardRecbuf.recordcount);
 
           char cmd[30];
           char *c;
@@ -5335,7 +5335,7 @@
                   if(0 == READ(CHECKFILEMENT0_PIN))
                   {
                     RTS_SndData(ExchangePageBase + 39, ExchangepageAddr);
-                    TJS_SendCmd("page nofilament");
+                    TJC_SendCmd("page nofilament");
                     sdcard_pause_check = false;
                     break;
                   }
@@ -5356,25 +5356,25 @@
 
           #if ENABLED(BABYSTEPPING)
           RTS_SndData(0, AUTO_BED_LEVEL_ZOFFSET_VP);
-          TJS_SendCmd("leveldata.z_offset.val=%d", 0);
+          TJC_SendCmd("leveldata.z_offset.val=%d", 0);
           #endif
 
           feedrate_percentage = 100;
           RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
           zprobe_zoffset = last_zoffset;
           RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-          TJS_SendCmd("printpause.printvalue.txt=\"0\""); 
-          TJS_SendCmd("printpause.printprocess.val=0"); 
-          TJS_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
+          TJC_SendCmd("printpause.printvalue.txt=\"0\""); 
+          TJC_SendCmd("printpause.printprocess.val=0"); 
+          TJC_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
 
           PoweroffContinue = true;
 
           //切换正在打印页面
           RTS_SndData(ExchangePageBase + 10, ExchangepageAddr);
           #if ENABLED(TJC_AVAILABLE) 
-            TJS_SendCmd("page printpause");
+            TJC_SendCmd("page printpause");
             restFlag2 = 0;
-            TJS_SendCmd("restFlag2=0");
+            TJC_SendCmd("restFlag2=0");
             pause_count_pos = 0;
           #endif
 
@@ -5428,7 +5428,7 @@
         }
         else if(recdat.data[0] == 0x0A)
         {
-          TJS_SendCmd("page main");
+          TJC_SendCmd("page main");
         }
       }
       break;
@@ -5660,7 +5660,7 @@
         rtscheck.RTS_SndData((unsigned char)card.percentDone(), PRINT_PROCESS_VP);
 
         RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
-        TJS_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
+        TJC_SendCmd("leveldata.z_offset.val=%d", (int)(zprobe_zoffset * 100));
         RTS_SndData(feedrate_percentage, PRINT_SPEED_RATE_VP);
         #if HAS_HOTEND
           RTS_SndData(thermalManager.temp_hotend[0].target, HEAD0_SET_TEMP_VP);
@@ -5681,69 +5681,69 @@
         {
           if(READ(X_MIN_PIN))
           {
-            TJS_SendCmd("x.bco=1024");
+            TJC_SendCmd("x.bco=1024");
           }
           else
           {
-            TJS_SendCmd("x.bco=50712");
+            TJC_SendCmd("x.bco=50712");
           }
         }
         else if (recdat.data[0] == 0x01) //Y限位
         {
           if(READ(Y_MIN_PIN))
           {
-            TJS_SendCmd("y.bco=1024");
+            TJC_SendCmd("y.bco=1024");
           }
           else
           {
-            TJS_SendCmd("y.bco=50712");
+            TJC_SendCmd("y.bco=50712");
           }
         }
         else if (recdat.data[0] == 0x02) //Z限位
         {
           if(READ(Z_MIN_PROBE_PIN))
           {
-            TJS_SendCmd("z.bco=1024");
+            TJC_SendCmd("z.bco=1024");
           }
           else
           {
-            TJS_SendCmd("z.bco=50712");
+            TJC_SendCmd("z.bco=50712");
           }
         }
         else if (recdat.data[0] == 0x03) //mtd状态
         {
           if(READ(CHECKFILEMENT0_PIN))
           {
-            TJS_SendCmd("mtd.bco=1024");
+            TJC_SendCmd("mtd.bco=1024");
           }
           else
           {
-            TJS_SendCmd("mtd.bco=50712");
+            TJC_SendCmd("mtd.bco=50712");
           }
         }
         else if (recdat.data[0] == 0x04) //加热喷头
         {
           thermalManager.temp_hotend[0].target = 260;
           thermalManager.setTargetHotend(thermalManager.temp_hotend[0].target, 0);
-          TJS_SendCmd("nozzle.bco=1024");
+          TJC_SendCmd("nozzle.bco=1024");
         }
         else if (recdat.data[0] == 0x05) //加热热床
         {
           thermalManager.temp_bed.target = 100;
           thermalManager.setTargetBed(thermalManager.temp_bed.target);
-          TJS_SendCmd("bed.bco=1024");
+          TJC_SendCmd("bed.bco=1024");
         }
         else if (recdat.data[0] == 0x06) //开启模型散热风扇
         {
           thermalManager.set_fan_speed(0, 255);
-          TJS_SendCmd("fan.bco=1024");
-          TJS_SendCmd("set.va0.val=1");
+          TJC_SendCmd("fan.bco=1024");
+          TJC_SendCmd("set.va0.val=1");
         }  
         else if (recdat.data[0] == 0x07) //开照明灯
         {
           status_led2 = true;
-          TJS_SendCmd("status_led2=1");
-          TJS_SendCmd("led.bco=1024");
+          TJC_SendCmd("status_led2=1");
+          TJC_SendCmd("led.bco=1024");
           #if PIN_EXISTS(LED3)
             OUT_WRITE(LED3_PIN, HIGH);
           #endif
@@ -5752,25 +5752,25 @@
         {
           thermalManager.temp_hotend[0].target = 0;
           thermalManager.setTargetHotend(thermalManager.temp_hotend[0].target, 0);
-          TJS_SendCmd("nozzle.bco=50712");
+          TJC_SendCmd("nozzle.bco=50712");
         }
         else if (recdat.data[0] == 0x09) //关热床
         {
           thermalManager.temp_bed.target = 0;
           thermalManager.setTargetBed(thermalManager.temp_bed.target);
-          TJS_SendCmd("bed.bco=50712");
+          TJC_SendCmd("bed.bco=50712");
         }
         else if (recdat.data[0] == 0x0A) //关模型风扇
         {
           thermalManager.set_fan_speed(0, 0);
-          TJS_SendCmd("fan.bco=50712");
-          TJS_SendCmd("set.va0.val=0");
+          TJC_SendCmd("fan.bco=50712");
+          TJC_SendCmd("set.va0.val=0");
         }
         else if (recdat.data[0] == 0x0B) //关照明灯
         {
           status_led2 = false;
-          TJS_SendCmd("status_led2=0");
-          TJS_SendCmd("led.bco=50712");
+          TJC_SendCmd("status_led2=0");
+          TJC_SendCmd("led.bco=50712");
           #if PIN_EXISTS(LED3)
             OUT_WRITE(LED3_PIN, LOW);
           #endif
@@ -5782,15 +5782,15 @@
 
           destination.set(15,15,15,15);
           prepare_internal_move_to_destination(500);
-          TJS_SendCmd("motor1.bco=1024");
-          TJS_SendCmd("motor2.bco=50712");
+          TJC_SendCmd("motor1.bco=1024");
+          TJC_SendCmd("motor2.bco=50712");
         }
         else if (recdat.data[0] == 0x0D) //反转
         {
           destination.set(10,10,10,10);
           prepare_internal_move_to_destination(500);
-          TJS_SendCmd("motor1.bco=50712");
-          TJS_SendCmd("motor2.bco=1024");
+          TJC_SendCmd("motor1.bco=50712");
+          TJC_SendCmd("motor2.bco=1024");
         }
         else if (recdat.data[0] == 0x0E) //
         {
@@ -5802,7 +5802,7 @@
           SdFile dir, root = card.getroot();
           if (dir.open(&root, MKSTestPath, O_RDONLY))
           {
-            TJS_SendCmd("page hardwaretest");
+            TJC_SendCmd("page hardwaretest");
           }
         }                            
       }
