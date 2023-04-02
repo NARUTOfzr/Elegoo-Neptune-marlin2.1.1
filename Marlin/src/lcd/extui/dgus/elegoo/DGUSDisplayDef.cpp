@@ -442,6 +442,7 @@
 
   /*
     发送预览图统一使用printpause页面的va0,va1作为buffer
+    elegoo cura插件生成的gcode中缩略图每行固定1024bytes
   */
   static bool TJC_sendThumbnailFromFile(const char *page, const char *filename)
   {
@@ -480,128 +481,96 @@
       return false;
 
     TJC_SendCmd("printpause.va1.txt=\"\"");
-    uint32_t gPicturePreviewStart = 0;
-    uint64_t cnt_pre = 0;
-    uint8_t buffer[1024];
+    char buffer[1024];
+    bool hasThumbnail = false;
+    uint32_t offset = 0;
     while(1)
     {
-      memset(buffer, 0, sizeof(buffer));
       int16_t bytes = file.read(buffer, sizeof(buffer));
       if((unsigned int)bytes < sizeof(buffer))
-        break;
-      cnt_pre += bytes;
-
-      uint32_t *p1  = (uint32_t *)strstr((char *)buffer, ";simage:");
-      uint32_t *m1  = (uint32_t *)strstr((char *)buffer, "M10086");
-      if(m1)
-      {
-        cnt_pre = 0;
-        TJC_SendCmd("%s.cp0.aph=0", page);
-        TJC_SendCmd("%s.cp0.close()", page);
+        break; // reach end of file
+      char *p = strstr(buffer, ";simage:"); // thumbnail flag
+      if (p) {
+        hasThumbnail = true;
+        offset += p - buffer;
         break;
       }
-      
-      if(p1)
-      { 
-        cnt_pre = 0;
-        while(1)
+      if (strstr(buffer, "M104 ")) // gcode for set hotend temp
+        break;
+      if (offset > 10 * 1024)
+        break;
+      offset += bytes;
+    }
+
+    TERN_(USE_WATCHDOG, hal.watchdog_refresh());
+
+    if (hasThumbnail)
+    {
+      // show empty image fisrt
+      TJC_SendCmd("%s.cp0.aph=127", page);
+      file.seekset(offset);
+      while(1)
+      {
+        int16_t bytes = file.read(buffer, sizeof(buffer));
+        if((unsigned int)bytes < sizeof(buffer))
+          break;
+        if (!strncmp(buffer, ";simage:", 8))
         {
-          memset(buffer, 0, sizeof(buffer));
-          int16_t byte = file.read(buffer, sizeof(buffer));
-          if(byte < 0)
-            break;
-          cnt_pre += byte;
-          uint32_t *p2  = (uint32_t *)strstr((char *)buffer, ";;simage:");
-          uint32_t *p3  = (uint32_t *)strstr((char *)buffer, ";00000");
-          if(p2||p3)
-          {
-            // 文件读取指针复位
-            file.rewind();
-            while(1) //";gimage:"起始位置
-            {
-              while(1)
-              {
-                TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-                memset(buffer, 0, sizeof(buffer));
-                int16_t byte = file.read(buffer, 1024);
-                if(byte < 0)
-                  break;
-                gPicturePreviewStart+=byte;
-
-                uint32_t *p1 = (uint32_t *)strstr((char *)buffer, ";simage:");
-                uint32_t *p2 = (uint32_t *)strstr((char *)buffer, ";;simage:");
-                uint32_t *p3 = (uint32_t *)strstr((char *)buffer, ";00000");
-                uint32_t *p4 = (uint32_t *)strstr((char *)buffer, ";;gimage:");
-                if(p1 == 0 && p2 == 0 && p4 == 0 && p3)
-                {
-                  TJC_SendCmd("%s.cp0.aph=127", page);
-                  TJC_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
-                  break;
-                }
-
-                if(p2)
-                {
-                  LCD_SERIAL_2.printf("printpause.va0.txt=");
-                  LCD_SERIAL_2.write('"');
-                  LCD_SERIAL_2.write(&buffer[9], 1023 - 9);
-                  LCD_SERIAL_2.write('"');
-                  LCD_SERIAL_2.printf("\xff\xff\xff");
-                  TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");
-                  TJC_SendCmd("%s.cp0.aph=127", page);
-                  TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-                  delay(200);
-                  TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-                  TJC_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
-                  cnt_pre = 102400;
-                  break;
-                }
-
-                if(p1)
-                {
-                  LCD_SERIAL_2.printf("printpause.va0.txt=");
-                  LCD_SERIAL_2.write('"');
-                  LCD_SERIAL_2.write(&buffer[8], 1023 - 8);
-                  LCD_SERIAL_2.write('"');
-                  LCD_SERIAL_2.printf("\xff\xff\xff");
-                  TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");
-                  TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-                  delay(200);
-                  TERN_(USE_WATCHDOG, hal.watchdog_refresh());
-                }
-              }
-              break;
-            }
-          }
-
-          if(cnt_pre >= 102400)
-            break;
+          LCD_SERIAL_2.printf("printpause.va0.txt=");
+          LCD_SERIAL_2.write('"');
+          LCD_SERIAL_2.write(&buffer[8], 1023 - 8);
+          LCD_SERIAL_2.write('"');
+          LCD_SERIAL_2.printf("\xff\xff\xff");
+          TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");
+          TERN_(USE_WATCHDOG, hal.watchdog_refresh());
+          delay(200);
+          TERN_(USE_WATCHDOG, hal.watchdog_refresh());
+        }
+        else if (!strncmp(buffer, ";;simage:", 9)) // last line of thumbnail
+        {
+          LCD_SERIAL_2.printf("printpause.va0.txt=");
+          LCD_SERIAL_2.write('"');
+          LCD_SERIAL_2.write(&buffer[9], 1023 - 9);
+          LCD_SERIAL_2.write('"');
+          LCD_SERIAL_2.printf("\xff\xff\xff");
+          TJC_SendCmd("printpause.va1.txt+=printpause.va0.txt");
+          TERN_(USE_WATCHDOG, hal.watchdog_refresh());
+          delay(200);
+          TERN_(USE_WATCHDOG, hal.watchdog_refresh());
+          TJC_SendCmd("%s.cp0.write(printpause.va1.txt)", page);
+          break;
+        }
+        else
+        {
+          break;
         }
       }
-
-      if(cnt_pre >= 102400)
-        break;
     }
     file.close();
-    return true;
+    if (!hasThumbnail)
+    {
+      TJC_SendCmd("%s.cp0.aph=0", page);
+      TJC_SendCmd("%s.cp0.close()", page);
+    }
+    return hasThumbnail;
   }
 
-  static void TJC_SendThumbnail(const char *page)
+  static bool TJC_SendThumbnail(const char *page)
   {
     TJC_SendCmd("%s.cp0.close()", page);
     TJC_SendCmd("%s.cp0.aph=0", page);
     char picname[64];
     sprintf(picname,"%s.txt", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
     if (TJC_sendThumbnailFromFile(page, picname))
-      return;
+      return true;
 
     SdFile *diveDir;
     const char *fname = card.diveToFile(true, diveDir, CardRecbuf.Cardfilename[CardRecbuf.recordcount]);
-    if (TJC_sendThumbnailFromGcode(page, fname))
-      delay(20);
+    return TJC_sendThumbnailFromGcode(page, fname);
   }
 #else
   #define TJC_SendCmd(fmt, arg...)
-  static void TJC_SendThumbnail() {}
+  static bool TJC_SendThumbnail() { return false; }
 #endif
 
   void RTSSHOW::RTS_SDCardInit(void)
@@ -5238,6 +5207,7 @@
           TJC_SendCmd("printpause.t0.txt=\"\"");
           RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], SELECT_FILE_TEXT_VP);
           TJC_SendCmd("askprint.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
+          TJC_SendCmd("askprint.t0.aph=0");
           TJC_SendCmd("printpause.t0.txt=\"%s\"", CardRecbuf.Cardshowfilename[CardRecbuf.recordcount]);
 
           delay(2);
@@ -5249,7 +5219,9 @@
           RTS_SndData(1, FILE1_SELECT_ICON_VP + (recdat.data[0] - 1));
           RTS_SndData(ExchangePageBase + 28, ExchangepageAddr);
           TJC_SendCmd("page askprint");
-          TJC_SendThumbnail("askprint");
+          if (!TJC_SendThumbnail("askprint")) {
+            TJC_SendCmd("askprint.t0.aph=127");
+          }
         }
       }
       break;
