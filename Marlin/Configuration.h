@@ -93,9 +93,9 @@
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_MKS_E3D_V2
   #if ENABLED(RTS_AVAILABLE)
-    //#define NEPTUNE_3_PRO      1
+    #define NEPTUNE_3_PRO      1
     //#define NEPTUNE_3_PLUS   1
-    #define NEPTUNE_3_MAX    1
+    //#define NEPTUNE_3_MAX    1
     #endif
 #endif
 
@@ -1196,11 +1196,11 @@
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
 #if NEPTUNE_3_PRO
-  #define DEFAULT_MAX_ACCELERATION      { 1100, 900, 100, 2000 }
+  #define DEFAULT_MAX_ACCELERATION      { 1100, 900, 100, 1000 }
 #elif NEPTUNE_3_PLUS
-  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 2000 }
+  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 1000 }
 #elif NEPTUNE_3_MAX
-  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 2000 }
+  #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 1000 }
 #endif
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
@@ -1216,9 +1216,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
