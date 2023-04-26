@@ -5696,18 +5696,18 @@
 
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G28 Z"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z3"));
-              queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y117.5"));
+              //queue.enqueue_now_P(PSTR("G1 F200 Z3"));
+              //queue.enqueue_now_P(PSTR("G1 F2000 X165 Y165"));
               queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G28 Z"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z3"));
-              queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y117.5"));
+              //queue.enqueue_now_P(PSTR("G1 F200 Z3"));
+              //queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y116"));
               queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));                
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G28 Z"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z3"));
-              queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y117.5"));
+              //queue.enqueue_now_P(PSTR("G1 F200 Z3"));
+              //queue.enqueue_now_P(PSTR("G1 F2000 X215 Y215"));
               queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif
 
