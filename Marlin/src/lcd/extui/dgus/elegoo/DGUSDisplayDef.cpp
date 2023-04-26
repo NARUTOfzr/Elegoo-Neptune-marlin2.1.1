@@ -482,7 +482,7 @@
         char *pointFilename = card.longFilename;
         int filenamelen = strlen(card.longFilename);
         int j = 1;
-        while((strncmp(&pointFilename[j], ".gcode", 6) && strncmp(&pointFilename[j], ".GCODE", 6)) && ((j++) < filenamelen));
+        while((strncmp(&pointFilename[j], ".gcode", 6)) && ((j++) < filenamelen));
         if(j >= filenamelen)
         {
           //addrnum++;
@@ -5068,7 +5068,7 @@
           active_extruder_font = active_extruder;
           Update_Time_Value = 0;
           queue.enqueue_now_P(PSTR("G28"));
-          queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
+          queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
           RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
 
           #if ENABLED(TJC_AVAILABLE) 
@@ -5420,9 +5420,9 @@
           else
           #endif
           {
-            queue.enqueue_now_P(PSTR("G28 Z0"));
+            queue.enqueue_now_P(PSTR("G28 Z"));
           }
-          queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
+          queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
         }
         else if (recdat.data[0] == 2)
         {
@@ -5695,14 +5695,20 @@
             //waitway = 4;
 
             #if ENABLED(NEPTUNE_3_PLUS)
-              queue.enqueue_now_P(PSTR("G28 Z0"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
+              queue.enqueue_now_P(PSTR("G28 Z"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z3"));
+              queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y117.5"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
-              queue.enqueue_now_P(PSTR("G28 Z0"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));                
+              queue.enqueue_now_P(PSTR("G28 Z"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z3"));
+              queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y117.5"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));                
             #elif ENABLED(NEPTUNE_3_MAX)
-              queue.enqueue_now_P(PSTR("G28 Z0"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.0"));
+              queue.enqueue_now_P(PSTR("G28 Z"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z3"));
+              queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y117.5"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif
 
             //waitway = 0;
@@ -5717,15 +5723,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y32.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y215 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0")); 
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1")); 
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif
 
             //waitway = 0;
@@ -5740,15 +5746,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y215 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif  
 
             //waitway = 0;
@@ -5763,15 +5769,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y292.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y392.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif  
 
             //waitway = 0;
@@ -5786,15 +5792,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X292.5 Y297.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X392.5 Y392.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif  
 
             //waitway = 0;
@@ -5809,15 +5815,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X292.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X392.5 Y215 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif  
 
             //waitway = 0;
@@ -5832,15 +5838,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X292.5 Y32.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X392.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
             #endif  
 
             //waitway = 0;

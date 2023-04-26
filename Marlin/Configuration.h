@@ -93,8 +93,8 @@
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_MKS_E3D_V2
   #if ENABLED(RTS_AVAILABLE)
-    #define NEPTUNE_3_PRO      1
-    //#define NEPTUNE_3_PLUS   1
+    //#define NEPTUNE_3_PRO      1
+    #define NEPTUNE_3_PLUS   1
     //#define NEPTUNE_3_MAX    1
     #endif
 #endif
@@ -1201,6 +1201,8 @@
   #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 1000 }
 #elif NEPTUNE_3_MAX
   #define DEFAULT_MAX_ACCELERATION      { 700, 700, 100, 1000 }
+#else
+  #define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 5000 }
 #endif
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
@@ -1216,10 +1218,23 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
-
+#if NEPTUNE_3_PRO
+ #define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+ #define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+ #define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
+#elif NEPTUNE_3_PLUS
+ #define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+ #define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+ #define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
+#elif NEPTUNE_3_MAX
+ #define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+ #define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+ #define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
+#else
+ #define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+ #define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+ #define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
+#endif
 /**
  * Default Jerk limits (mm/s)
  * Override with M205 X Y Z . . . E
@@ -2114,7 +2129,7 @@
  * Useful to retract or move the Z probe out of the way.
  */
 //#define Z_PROBE_END_SCRIPT "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
-#define Z_PROBE_END_SCRIPT "G28 Z\nG1 F200 Z0.1"
+#define Z_PROBE_END_SCRIPT "M500\nG28 Z\nG1 F200 Z0.1"
 
 // @section homing
 
