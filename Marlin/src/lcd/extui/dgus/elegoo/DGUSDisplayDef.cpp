@@ -52,7 +52,9 @@
   #include "../../../../lcd/extui/dgus/DGUSScreenHandler.h"
   #include "../../../../lcd/extui/dgus/DGUSScreenHandler.h"
   #include "../../../../lcd/extui/dgus/DGUSScreenHandlerBase.h"
-  #include "../../../../lcd/extui/dgus/DGUSVPVariable.h"
+  #include "../../../../../src/feature/host_actions.h"
+
+
   
 
   //Stepper stepper; // Singleton
@@ -874,6 +876,11 @@
     // represents to update file list
     if(CardUpdate && lcd_sd_status && RTS_SD_Detected())
     {
+      //If you are not in the printing state when entering the file list menu, remount the SD card to prevent it from loosening halfway and causing errors when printing documents later
+      if(!card.isPrinting()){
+        RTS_SDCardInit();
+      }
+
       for(uint16_t i = 0;i < CardRecbuf.Filesum;i++)
       {
         delay(1);
@@ -1617,7 +1624,7 @@
 
       #if ENABLED(TJC_AVAILABLE)
 
-        if(enable_filment_check)
+        if(enable_filment_check)//断料检测
         {
           LCD_SERIAL_2.printf("set.va1.val=1");
           LCD_SERIAL_2.printf("\xff\xff\xff");            
@@ -1953,7 +1960,7 @@
         }
       #endif
         
-        if(enable_filment_check)
+        if(enable_filment_check)//9999----材料检测
         {
           #if ENABLED(CHECKFILEMENT)
 
@@ -3696,9 +3703,9 @@
         {
           if(temp_ctrl)
           {
-            if((thermalManager.temp_hotend[0].target + unit)>260)
+            if((thermalManager.temp_hotend[0].target + unit)>HEATER_0_MAXTEMP-15)
             {
-              thermalManager.temp_hotend[0].target = 260;
+              thermalManager.temp_hotend[0].target = HEATER_0_MAXTEMP-15;
             }
             else
             {
@@ -3718,9 +3725,9 @@
           }
           else
           {
-            if((thermalManager.temp_bed.target + unit)>110)
+            if((thermalManager.temp_bed.target + unit)>BED_MAXTEMP-15)
             {
-              thermalManager.temp_bed.target = 110;
+              thermalManager.temp_bed.target = BED_MAXTEMP-15;
             }
             else
             {
@@ -7368,6 +7375,11 @@
           {
             RTS_SndData(0, PRINT_FILE_TEXT_VP + j);
           }
+            LCD_SERIAL_2.printf("printpause.cp0.close()");
+            LCD_SERIAL_2.printf("\xff\xff\xff");
+
+            LCD_SERIAL_2.printf("printpause.cp0.aph=0");
+            LCD_SERIAL_2.printf("\xff\xff\xff");  
 
           RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
 
