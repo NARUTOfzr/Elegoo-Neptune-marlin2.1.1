@@ -24,63 +24,63 @@ extern "C" {
 #endif // __cplusplus
 
 
-//                  | DIGITAL | ANALOG | USART     | TWI      | SPI                    | SPECIAL   |
-//                  |---------|--------|-----------|----------|------------------------|-----------|
-#define PA0  A0  // | 0       | A0     |           |          |                        |           |
-#define PA1  A1  // | 1       | A1     |           |          |                        |           |
-#define PA2  A2  // | 2       | A2     | USART2_TX |          |                        |           |
-#define PA3  A3  // | 3       | A3     | USART2_RX |          |                        |           |
-#define PA4  A4  // | 4       | A4     |           |          | SPI1_SS, (SPI3_SS)     |           |
-#define PA5  A5  // | 5       | A5     |           |          | SPI1_SCK               |           |
-#define PA6  A6  // | 6       | A6     |           |          | SPI1_MISO              |           |
-#define PA7  A7  // | 7       | A7     |           |          | SPI1_MOSI              |           |
-#define PA8  8   // | 8       |        |           | TWI3_SCL |                        |           |
-#define PA9  9   // | 9       |        | USART1_TX |          |                        |           |
-#define PA10 10  // | 10      |        | USART1_RX |          |                        |           |
-#define PA11 11  // | 11      |        | USART6_TX |          |                        |           |
-#define PA12 12  // | 12      |        | USART6_RX |          |                        |           |
-#define PA13 13  // | 13      |        |           |          |                        | SWD_SWDIO |
-#define PA14 14  // | 14      |        |           |          |                        | SWD_SWCLK |
-#define PA15 15  // | 15      |        |           |          | SPI3_SS, (SPI1_SS)     |           |
-//                  |---------|--------|-----------|----------|------------------------|-----------|
-#define PB0  A8  // | 16      | A8     |           |          |                        |           |
-#define PB1  A9  // | 17      | A9     |           |          |                        |           |
-#define PB2  18  // | 18      |        |           |          |                        | BOOT1     |
-#define PB3  19  // | 19      |        |           | TWI2_SDA | SPI3_SCK,  (SPI1_SCK)  |           |
-#define PB4  20  // | 20      |        |           | TWI3_SDA | SPI3_MISO, (SPI1_MISO) |           |
-#define PB5  21  // | 21      |        |           |          | SPI3_MOSI, (SPI1_MOSI) |           |
-#define PB6  22  // | 22      |        | USART1_TX | TWI1_SCL |                        |           |
-#define PB7  23  // | 23      |        | USART1_RX | TWI1_SDA |                        |           |
-#define PB8  24  // | 24      |        |           | TWI1_SCL |                        |           |
-#define PB9  25  // | 25      |        |           | TWI1_SDA | SPI2_SS                |           |
-#define PB10 26  // | 26      |        |           | TWI2_SCL | SPI2_SCK               |           |
-#define PB12 27  // | 27      |        |           |          | SPI2_SS                |           |
-#define PB13 28  // | 28      |        |           |          | SPI2_SCK               |           |
-#define PB14 29  // | 29      |        |           |          | SPI2_MISO              |           |
-#define PB15 30  // | 30      |        |           |          | SPI2_MOSI              |           |
-//                  |---------|--------|-----------|----------|------------------------|-----------|
-#define PC0  A10 // | 31      | A10    |           |          |                        |           |
-#define PC1  A11 // | 32      | A11    |           |          |                        |           |
-#define PC2  A12 // | 33      | A12    |           |          | SPI2_MISO              |           |
-#define PC3  A13 // | 34      | A13    |           |          | SPI2_MOSI              |           |
-#define PC4  A14 // | 35      | A14    |           |          |                        |           |
-#define PC5  A15 // | 36      | A15    |           |          |                        |           |
-#define PC6  37  // | 37      |        | USART6_TX |          |                        |           |
-#define PC7  38  // | 38      |        | USART6_RX |          |                        |           |
-#define PC8  39  // | 39      |        |           |          |                        |           |
-#define PC9  40  // | 40      |        |           | TWI3_SDA |                        |           |
-#define PC10 41  // | 41      |        |           |          | SPI3_SCK               |           |
-#define PC11 42  // | 42      |        |           |          | SPI3_MISO              |           |
-#define PC12 43  // | 43      |        |           |          | SPI3_MOSI              |           |
-#define PC13 44  // | 44      |        |           |          |                        |           |
-#define PC14 45  // | 45      |        |           |          |                        | OSC32_IN  |
-#define PC15 46  // | 46      |        |           |          |                        | OSC32_OUT |
-//                  |---------|--------|-----------|----------|------------------------|-----------|
-#define PD2  47  // | 47      |        |           |          |                        |           |
-//                  |---------|--------|-----------|----------|------------------------|-----------|
-#define PH0  48  // | 48      |        |           |          |                        | OSC_IN    |
-#define PH1  49  // | 49      |        |           |          |                        | OSC_OUT   |
-//                  |---------|--------|-----------|----------|------------------------|-----------|
+//                      | DIGITAL | ANALOG | USART     | TWI      | SPI                    | SPECIAL   |
+//                      |---------|--------|-----------|----------|------------------------|-----------|
+#define PA0  PIN_A0  // | 0       | PIN_A0 |           |          |                        |           |
+#define PA1  PIN_A1  // | 1       | PIN_A1 |           |          |                        |           |
+#define PA2  PIN_A2  // | 2       | PIN_A2 | USART2_TX |          |                        |           |
+#define PA3  PIN_A3  // | 3       | PIN_A3 | USART2_RX |          |                        |           |
+#define PA4  PIN_A4  // | 4       | PIN_A4 |           |          | SPI1_SS, (SPI3_SS)     |           |
+#define PA5  PIN_A5  // | 5       | PIN_A5 |           |          | SPI1_SCK               |           |
+#define PA6  PIN_A6  // | 6       | PIN_A6 |           |          | SPI1_MISO              |           |
+#define PA7  PIN_A7  // | 7       | PIN_A7 |           |          | SPI1_MOSI              |           |
+#define PA8  8       // | 8       |        |           | TWI3_SCL |                        |           |
+#define PA9  9       // | 9       |        | USART1_TX |          |                        |           |
+#define PA10 10      // | 10      |        | USART1_RX |          |                        |           |
+#define PA11 11      // | 11      |        | USART6_TX |          |                        |           |
+#define PA12 12      // | 12      |        | USART6_RX |          |                        |           |
+#define PA13 13      // | 13      |        |           |          |                        | SWD_SWDIO |
+#define PA14 14      // | 14      |        |           |          |                        | SWD_SWCLK |
+#define PA15 15      // | 15      |        |           |          | SPI3_SS, (SPI1_SS)     |           |
+//                      |---------|--------|-----------|----------|------------------------|-----------|
+#define PB0  PIN_A8  // | 16      | PIN_A8 |           |          |                        |           |
+#define PB1  PIN_A9  // | 17      | PIN_A9 |           |          |                        |           |
+#define PB2  18      // | 18      |        |           |          |                        | BOOT1     |
+#define PB3  19      // | 19      |        |           | TWI2_SDA | SPI3_SCK,  (SPI1_SCK)  |           |
+#define PB4  20      // | 20      |        |           | TWI3_SDA | SPI3_MISO, (SPI1_MISO) |           |
+#define PB5  21      // | 21      |        |           |          | SPI3_MOSI, (SPI1_MOSI) |           |
+#define PB6  22      // | 22      |        | USART1_TX | TWI1_SCL |                        |           |
+#define PB7  23      // | 23      |        | USART1_RX | TWI1_SDA |                        |           |
+#define PB8  24      // | 24      |        |           | TWI1_SCL |                        |           |
+#define PB9  25      // | 25      |        |           | TWI1_SDA | SPI2_SS                |           |
+#define PB10 26      // | 26      |        |           | TWI2_SCL | SPI2_SCK               |           |
+#define PB12 27      // | 27      |        |           |          | SPI2_SS                |           |
+#define PB13 28      // | 28      |        |           |          | SPI2_SCK               |           |
+#define PB14 29      // | 29      |        |           |          | SPI2_MISO              |           |
+#define PB15 30      // | 30      |        |           |          | SPI2_MOSI              |           |
+//                      |---------|--------|-----------|----------|------------------------|-----------|
+#define PC0  PIN_A10 // | 31      | PIN_A10|           |          |                        |           |
+#define PC1  PIN_A11 // | 32      | PIN_A11|           |          |                        |           |
+#define PC2  PIN_A12 // | 33      | PIN_A12|           |          | SPI2_MISO              |           |
+#define PC3  PIN_A13 // | 34      | PIN_A13|           |          | SPI2_MOSI              |           |
+#define PC4  PIN_A14 // | 35      | PIN_A14|           |          |                        |           |
+#define PC5  PIN_A15 // | 36      | PIN_A15|           |          |                        |           |
+#define PC6  37      // | 37      |        | USART6_TX |          |                        |           |
+#define PC7  38      // | 38      |        | USART6_RX |          |                        |           |
+#define PC8  39      // | 39      |        |           |          |                        |           |
+#define PC9  40      // | 40      |        |           | TWI3_SDA |                        |           |
+#define PC10 41      // | 41      |        |           |          | SPI3_SCK               |           |
+#define PC11 42      // | 42      |        |           |          | SPI3_MISO              |           |
+#define PC12 43      // | 43      |        |           |          | SPI3_MOSI              |           |
+#define PC13 44      // | 44      |        |           |          |                        |           |
+#define PC14 45      // | 45      |        |           |          |                        | OSC32_IN  |
+#define PC15 46      // | 46      |        |           |          |                        | OSC32_OUT |
+//                      |---------|--------|-----------|----------|------------------------|-----------|
+#define PD2  47      // | 47      |        |           |          |                        |           |
+//                      |---------|--------|-----------|----------|------------------------|-----------|
+#define PH0  48      // | 48      |        |           |          |                        | OSC_IN    |
+#define PH1  49      // | 49      |        |           |          |                        | OSC_OUT   |
+//                      |---------|--------|-----------|----------|------------------------|-----------|
 
 // This must be a literal
 #define NUM_DIGITAL_PINS        50
