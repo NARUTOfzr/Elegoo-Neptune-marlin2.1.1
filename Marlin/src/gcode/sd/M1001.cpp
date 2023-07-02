@@ -133,9 +133,17 @@ void GcodeSuite::M1001() {
     rtscheck.RTS_SndData(ExchangePageBase + 9, ExchangepageAddr);
     
     #if ENABLED(TJC_AVAILABLE) 
-      LCD_SERIAL_2.printf("page printfinish");
+      //9999----07022339
+      LCD_SERIAL_2.printf("printpause.cp0.close()");
       LCD_SERIAL_2.printf("\xff\xff\xff");
-      queue.enqueue_now_P(PSTR("M84")); 
+
+      LCD_SERIAL_2.printf("printpause.cp0.aph=0");
+      LCD_SERIAL_2.printf("\xff\xff\xff");  
+
+      LCD_SERIAL_2.printf("page printfinish");//9999----打印完成界面
+      LCD_SERIAL_2.printf("\xff\xff\xff");
+      //9999---queue.enqueue_now_P(PSTR("M84")); 
+
     #endif
     
   #endif  

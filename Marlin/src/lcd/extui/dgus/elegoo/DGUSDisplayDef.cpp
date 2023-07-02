@@ -192,7 +192,7 @@
   uint8_t restFlag2 = 0;
 
   uint8_t lcd_verion        = 100; //外部LCD版本号
-  uint8_t board_lcd_verion  = 142; //外部LCD版本号
+  uint8_t board_lcd_verion  = 143; //外部LCD版本号
 
   static int16_t top_file          = 0; //< file on top of file chooser
   static int16_t max_top           = 0;
@@ -484,7 +484,7 @@
         char *pointFilename = card.longFilename;
         int filenamelen = strlen(card.longFilename);
         int j = 1;
-        while((strncmp(&pointFilename[j], ".gcode", 6)) && ((j++) < filenamelen));
+        while((strncmp(&pointFilename[j], ".gcode", 6) && strncmp(&pointFilename[j], ".GCODE", 6)) && ((j++) < filenamelen));
         if(j >= filenamelen)
         {
           //addrnum++;
@@ -876,10 +876,10 @@
     // represents to update file list
     if(CardUpdate && lcd_sd_status && RTS_SD_Detected())
     {
-      //If you are not in the printing state when entering the file list menu, remount the SD card to prevent it from loosening halfway and causing errors when printing documents later
-      if(!card.isPrinting()){
-        RTS_SDCardInit();
-      }
+      //9999---//If you are not in the printing state when entering the file list menu, remount the SD card to prevent it from loosening halfway and causing errors when printing documents later
+      // if(!card.isPrinting()){
+      //   RTS_SDCardInit();
+      // }
 
       for(uint16_t i = 0;i < CardRecbuf.Filesum;i++)
       {
@@ -2088,7 +2088,7 @@
               if( (0 == READ(CHECKFILEMENT0_PIN)) ||  RTS_M600_Flag)
               {
                 Checkfilenum++;
-                delay(5);
+                delay(100);//9999---断料检测触发延时时间
               }
               else
               {
@@ -2273,7 +2273,7 @@
           #endif
         #endif
 
-        queue.enqueue_now_P(PSTR("M84"));
+        //9999---queue.enqueue_now_P(PSTR("M84"));
       }
       #endif
 
@@ -2407,7 +2407,7 @@
         #endif
       #endif
 
-      queue.enqueue_now_P(PSTR("M84"));
+      //9999---queue.enqueue_now_P(PSTR("M84"));
 
       #if ENABLED(TJC_AVAILABLE)
 
@@ -2448,7 +2448,7 @@
           sprintf(fileicon, "printfiles.p%d.pic=196", target_line); 
           LCD_SERIAL_2.printf(fileicon);
           LCD_SERIAL_2.printf("\xff\xff\xff");
-          delay(10);         
+          delay(1);         
         #endif
 
         //清文件名
@@ -2593,7 +2593,7 @@
 
     switch(Checkkey)
     {
-      case MainPageKey:
+      case MainPageKey://9999---主界面按钮
       {
         if(recdat.data[0] == 1)
         {
@@ -2617,7 +2617,16 @@
               else 
               {
                 LCD_SERIAL_2.printf("page file1");
+                LCD_SERIAL_2.printf("\xff\xff\xff"); 
+                //9999----//If you are not in the printing state when entering the file list menu, remount the SD card to prevent it from loosening halfway and causing errors when printing documents later
+                if(!card.isPrinting()){
+                    RTS_SDCardInit();
+                  }
               } 
+                //9999----不可放在这里
+                // if(!card.isPrinting()){
+                //     RTS_SDCardInit();
+                //   }
               LCD_SERIAL_2.printf("\xff\xff\xff"); 
             #endif
           }
@@ -3096,7 +3105,7 @@
 
           //card.startFileprint();
           //card.startOrResumeFilePrinting();
-          //print_job_timer.start();
+          //9999---print_job_timer.start();
 
           if (ExtUI::isPrintingFromMediaPaused()) 
           {
@@ -3212,6 +3221,7 @@
                     #if ENABLED(TJC_AVAILABLE)
                       LCD_SERIAL_2.printf("page printpause");
                       LCD_SERIAL_2.printf("\xff\xff\xff");
+                      //print_job_timer.start();//9999---
                     #endif 
                   }
                 }
@@ -3480,7 +3490,7 @@
 
                                 LCD_SERIAL_2.printf("printpause.cp0.aph=127");
                                 LCD_SERIAL_2.printf("\xff\xff\xff");
-
+                                //9999----
                                 TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                                 delay(200);
                                 TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -3499,7 +3509,7 @@
                                 LCD_SERIAL_2.printf("\xff\xff\xff");
                                 LCD_SERIAL_2.printf("printpause.va1.txt+=printpause.va0.txt");
                                 LCD_SERIAL_2.printf("\xff\xff\xff");
-
+                                //9999----
                                 TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                                 delay(200);
                                 TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -3602,6 +3612,7 @@
             #if ENABLED(TJC_AVAILABLE)
               LCD_SERIAL_2.printf("page printpause");
               LCD_SERIAL_2.printf("\xff\xff\xff");
+            print_job_timer.start();        //9999----
             #endif             
           }
         }
@@ -4720,17 +4731,17 @@
             if(recdat.data[0]==1)
             {
               probe_extrusion_temp = (probe_extrusion_temp + unit);
-              if(probe_extrusion_temp>280)
+              if(probe_extrusion_temp>200)//9999----调平温度-增加
               {
-                probe_extrusion_temp = 280;
+                probe_extrusion_temp = 200;
               }
             }
             else if(recdat.data[0]==2)
             {
               probe_extrusion_temp = (probe_extrusion_temp - unit);
-              if(probe_extrusion_temp<140)
+              if(probe_extrusion_temp<0)//9999----调平温度-减小
               {
-                probe_extrusion_temp = 140;
+                probe_extrusion_temp = 0;
               }        
             }
             memset(temp,0,sizeof(temp));
@@ -4865,7 +4876,7 @@
             if(recdat.data[0]==1)
             {
               probe_bed_temp = (probe_bed_temp + unit);
-              if(probe_bed_temp>110)
+              if(probe_bed_temp>110)//9999---调平热床温度
               {
                 probe_bed_temp = 110;
               }
@@ -4873,9 +4884,9 @@
             else if(recdat.data[0]==2)
             {
               probe_bed_temp = (probe_bed_temp - unit);
-              if(probe_bed_temp<50)
+              if(probe_bed_temp<0)//9999---调平热床温度
               {
-                probe_bed_temp = 50;
+                probe_bed_temp = 0;
               }        
             }
             memset(temp,0,sizeof(temp));
@@ -5075,13 +5086,23 @@
           active_extruder_font = active_extruder;
           Update_Time_Value = 0;
           queue.enqueue_now_P(PSTR("G28"));
-          queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+          queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
           RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
 
           #if ENABLED(TJC_AVAILABLE) 
           
             LCD_SERIAL_2.printf("page autohome");
             LCD_SERIAL_2.printf("\xff\xff\xff");
+
+            //07021527-增加条件判断进入回原点失败界面后返回。
+            // if (/* condition */)
+            // {
+            //   /* code */
+            // }
+            
+
+
+
 
             #if ENABLED(NEPTUNE_3_PLUS)
               LCD_SERIAL_2.printf("leveling.va1.val=2");
@@ -5123,7 +5144,7 @@
             RTS_SndData(thermalManager.temp_hotend[1].target, HEAD1_SET_TEMP_VP);
             RTS_SndData(10 * Filament1LOAD, HEAD1_FILAMENT_LOAD_DATA_VP);
           #endif
-
+                                //9999----
           delay(2);
           //RTS_SndData(ExchangePageBase + 23, ExchangepageAddr);
           RTS_SndData(ExchangePageBase + 32, ExchangepageAddr);
@@ -5333,6 +5354,7 @@
         {
           Update_Time_Value = RTS_UPDATE_VALUE;
           #if ENABLED(EEPROM_SETTINGS)
+          
             settings.save();
           #endif
           queue.enqueue_now_P(PSTR("G1 F1000 Z15.0"));
@@ -5429,7 +5451,7 @@
           {
             queue.enqueue_now_P(PSTR("G28 Z"));
           }
-          queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+          queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
         }
         else if (recdat.data[0] == 2)
         {
@@ -5595,18 +5617,32 @@
           LCD_SERIAL_2.printf(temp);
           LCD_SERIAL_2.printf("\xff\xff\xff"); 
 
-          //printtime
+          //printtime//打印时间更新
           #if ENABLED(RTS_AVAILABLE) 
             duration_t elapsed = print_job_timer.duration();
             rtscheck.RTS_SndData(elapsed.value / 3600, PRINT_TIME_HOUR_VP);
             rtscheck.RTS_SndData((elapsed.value % 3600) / 60, PRINT_TIME_MIN_VP);
             #if ENABLED(TJC_AVAILABLE)
               memset(temp,0,sizeof(temp));   
-              sprintf(temp, "printpause.printtime.txt=\"%d h %d min\"", (int)elapsed.value/3600,(int)(elapsed.value % 3600)/60);
+              sprintf(temp, "printpause.printtime.txt=\"%dh %dmin\"", (int)elapsed.value/3600,(int)(elapsed.value % 3600)/60);
+              //sprintf(temp, "hardwaretest.printtime2.txt=\"%ds\"", (int)(elapsed.value % 3600)/1);
               LCD_SERIAL_2.printf(temp); 
               LCD_SERIAL_2.printf("\xff\xff\xff");            
             #endif  
           #endif
+
+          // //printtime-test
+          // #if ENABLED(RTS_AVAILABLE) 
+          //   //duration_t elapsed = print_job_timer.duration();
+          //   //rtscheck.RTS_SndData(elapsed.value / 60, PRINT_TIME_HOUR_VP);
+          //   rtscheck.RTS_SndData((elapsed.value % 3600) / 1, PRINT_TIME_S_VP);
+          //   #if ENABLED(TJC_AVAILABLE)
+          //     memset(temp,0,sizeof(temp));   
+          //     sprintf(temp, "hardwaretest.printtime2.txt=\"%d s\"", (int)(elapsed.value % 3600)/1);
+          //     LCD_SERIAL_2.printf(temp); 
+          //     LCD_SERIAL_2.printf("\xff\xff\xff");            
+          //   #endif  
+          // #endif
 
           //printpercent
           if(card.isPrinting() && (last_cardpercentValue != card.percentDone()))
@@ -5667,12 +5703,29 @@
             LCD_SERIAL_2.printf("\xff\xff\xff");
           #endif
         }
-        else if(recdat.data[0] == 12)  //0x0C
+        else if(recdat.data[0] == 12)  //0x0C   //9999----显示屏掉电恢复部分
         {
           if(!flag_power_on) //已开机
           {
             #if ENABLED(TJC_AVAILABLE)
             
+
+          // //if (recdat.data[0] == 0x0F) //9999---
+          //         {
+          //           const char *MKSTestPath = "MKS_TEST";
+
+          //           SdFile dir, root = card.getroot();
+          //           if (dir.open(&root, MKSTestPath, O_RDONLY))
+          //           {
+
+          //             LCD_SERIAL_2.printf("page hardwaretest");
+          //             LCD_SERIAL_2.printf("\xff\xff\xff");
+          //             startOrResumeJob();
+          //             print_job_timer.start();
+          //           }
+          //         }   
+
+
               //boot提示信息 
               LCD_SERIAL_2.printf("tm0.en=0");
               LCD_SERIAL_2.printf("\xff\xff\xff");
@@ -5705,17 +5758,17 @@
               queue.enqueue_now_P(PSTR("G28 Z"));
               //queue.enqueue_now_P(PSTR("G1 F200 Z3"));
               //queue.enqueue_now_P(PSTR("G1 F2000 X165 Y165"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G28 Z"));
               //queue.enqueue_now_P(PSTR("G1 F200 Z3"));
               //queue.enqueue_now_P(PSTR("G1 F2000 X117.5 Y116"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));                
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));                
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G28 Z"));
               //queue.enqueue_now_P(PSTR("G1 F200 Z3"));
               //queue.enqueue_now_P(PSTR("G1 F2000 X215 Y215"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif
 
             //waitway = 0;
@@ -5730,15 +5783,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y32.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y215 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1")); 
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05")); 
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif
 
             //waitway = 0;
@@ -5753,15 +5806,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y215 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif  
 
             //waitway = 0;
@@ -5776,15 +5829,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y292.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y392.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif  
 
             //waitway = 0;
@@ -5799,15 +5852,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X292.5 Y297.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X392.5 Y392.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif  
 
             //waitway = 0;
@@ -5822,15 +5875,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X292.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X392.5 Y215 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif  
 
             //waitway = 0;
@@ -5845,15 +5898,15 @@
             #if ENABLED(NEPTUNE_3_PLUS)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X292.5 Y32.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_PRO)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X37.5 Y165 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #elif ENABLED(NEPTUNE_3_MAX)
               queue.enqueue_now_P(PSTR("G1 F600 Z3")); 
               queue.enqueue_now_P(PSTR("G1 X392.5 Y37.5 F8000"));
-              queue.enqueue_now_P(PSTR("G1 F200 Z0.1"));
+              queue.enqueue_now_P(PSTR("G1 F200 Z0.05"));
             #endif  
 
             //waitway = 0;
@@ -6800,7 +6853,7 @@
             LCD_SERIAL_2.printf("\"");
             LCD_SERIAL_2.printf("\xff\xff\xff");
           #endif  
-
+                                //9999----
           delay(2);
           for(int j = 1;j <= CardRecbuf.Filesum;j ++)
           {
@@ -7073,7 +7126,7 @@
             RTS_SndData(0, PRINT_FILE_TEXT_VP + j);
           }
           RTS_SndData(CardRecbuf.Cardshowfilename[CardRecbuf.recordcount], PRINT_FILE_TEXT_VP);
-
+                                //9999----
           delay(2);
 
           #if ENABLED(BABYSTEPPING)
@@ -7215,7 +7268,7 @@
 
                           LCD_SERIAL_2.printf("printpause.cp0.aph=127");
                           LCD_SERIAL_2.printf("\xff\xff\xff");
-
+                                //9999----
                           TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                           delay(200);
                           TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -7237,7 +7290,7 @@
                           LCD_SERIAL_2.printf("\xff\xff\xff");
                           LCD_SERIAL_2.printf("printpause.va1.txt+=printpause.va0.txt");
                           LCD_SERIAL_2.printf("\xff\xff\xff");
-
+                                //9999----
                           TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                           delay(200);
                           TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -7592,7 +7645,7 @@
 
                               LCD_SERIAL_2.printf("printpause.cp0.aph=127");
                               LCD_SERIAL_2.printf("\xff\xff\xff");
-
+                              //9999----
                               TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                               delay(200);
                               TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -7614,7 +7667,7 @@
                               LCD_SERIAL_2.printf("\xff\xff\xff");
                               LCD_SERIAL_2.printf("printpause.va1.txt+=printpause.va0.txt");
                               LCD_SERIAL_2.printf("\xff\xff\xff");
-
+                              //9999----
                               TERN_(USE_WATCHDOG, hal.watchdog_refresh());
                               delay(200);
                               TERN_(USE_WATCHDOG, hal.watchdog_refresh());
@@ -7635,7 +7688,7 @@
                 }
 
                 file.close();
-                delay(20);
+                delay(20);                              //9999----
               }
 
               file.close();
@@ -7730,9 +7783,12 @@
             old_top_file  =  top_file;
           }
 
-          Printfiles_Update();      
+          Printfiles_Update(); 
+    
         }
+
       }
+      startOrResumeJob(); 
       break;
 
       case PrintSelectModeKey:
@@ -8039,14 +8095,14 @@
         }
         else if (recdat.data[0] == 0x04) //加热喷头
         {
-          thermalManager.temp_hotend[0].target = 260;
+          thermalManager.temp_hotend[0].target = 200;
           thermalManager.setTargetHotend(thermalManager.temp_hotend[0].target, 0);
           LCD_SERIAL_2.printf("nozzle.bco=1024");
           LCD_SERIAL_2.printf("\xff\xff\xff"); 
         }
         else if (recdat.data[0] == 0x05) //加热热床
         {
-          thermalManager.temp_bed.target = 100;
+          thermalManager.temp_bed.target = 60;
           thermalManager.setTargetBed(thermalManager.temp_bed.target);
           LCD_SERIAL_2.printf("bed.bco=1024");
           LCD_SERIAL_2.printf("\xff\xff\xff");    
@@ -8132,6 +8188,7 @@
         {
 
         }
+        //9999硬件测试检测
         else if (recdat.data[0] == 0x0F) 
         {
           const char *MKSTestPath = "MKS_TEST";

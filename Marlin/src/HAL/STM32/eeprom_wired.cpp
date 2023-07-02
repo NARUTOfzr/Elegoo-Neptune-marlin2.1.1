@@ -51,9 +51,9 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
     uint8_t * const p = (uint8_t * const)pos;
     if (v != eeprom_read_byte(p)) { // EEPROM has only ~100,000 write cycles, so only write bytes that have changed!
       eeprom_write_byte(p, v);
-      if (++written & 0x7F) delay(2); else safe_delay(2); // Avoid triggering watchdog during long EEPROM writes
+      if (++written & 0x7F) delay(20); else safe_delay(100); // Avoid triggering watchdog during long EEPROM writes
       if (eeprom_read_byte(p) != v) {
-        SERIAL_ECHO_MSG(STR_ERR_EEPROM_WRITE);
+        SERIAL_ECHO_MSG(STR_ERR_EEPROM_WRITE);//9999---
         return true;
       }
     }

@@ -751,7 +751,7 @@ void MarlinSettings::postprocess() {
 
   bool MarlinSettings::size_error(const uint16_t size) {
     if (size != datasize()) {
-      DEBUG_ERROR_MSG("EEPROM datasize error."
+      DEBUG_ERROR_MSG("EEPROM datasize error."//9999---
         #if ENABLED(MARLIN_DEV_MODE)
           " (Actual:", size, " Expected:", datasize(), ")"
         #endif
@@ -765,6 +765,16 @@ void MarlinSettings::postprocess() {
    * M500 - Store Configuration
    */
   bool MarlinSettings::save() {
+
+
+
+
+
+    planner.synchronize();
+
+
+
+
     float dummyf = 0;
     char ver[4] = "ERR";
 
@@ -1693,6 +1703,15 @@ void MarlinSettings::postprocess() {
     }
 
     TERN_(EXTENSIBLE_UI, ExtUI::onSettingsStored(!eeprom_error));
+    //
+    //
+    //
+    planner.synchronize();
+    //
+    //
+    //
+
+
 
     return !eeprom_error;
   }

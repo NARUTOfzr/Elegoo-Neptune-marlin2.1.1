@@ -25,6 +25,12 @@
 #include "../../core/serial.h"
 #include "../../inc/MarlinConfig.h"
 
+
+
+
+
+//#include "../../module/planner.h"
+
 #if ENABLED(CONFIGURATION_EMBEDDING)
   #include "../../sd/SdBaseFile.h"
   #include "../../mczip.h"
@@ -34,6 +40,7 @@
  * M500: Store settings in EEPROM
  */
 void GcodeSuite::M500() {
+  //planner.synchronize();
   (void)settings.save();
 }
 

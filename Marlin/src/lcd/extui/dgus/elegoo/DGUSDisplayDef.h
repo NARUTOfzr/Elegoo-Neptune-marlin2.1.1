@@ -58,6 +58,7 @@
   #define PRINT_PROCESS_ICON_VP              0x100E
   #define PRINT_TIME_HOUR_VP                 0x1010
   #define PRINT_TIME_MIN_VP                  0x1012
+  #define PRINT_TIME_S_VP                    0x1014
   #define PRINT_PROCESS_VP                   0x1016
   #define HEAD0_FAN_ICON_VP                  0x101E
   #define HEAD1_FAN_ICON_VP                  0x101F
@@ -391,11 +392,11 @@
   #define CORP_WEBSITE            "www.elegoo.com"
 
   #if NEPTUNE_3_PRO
-    #define SOFTVERSION             "1.1.5.1b"
+    #define SOFTVERSION             "1.1.5.1c"
   #elif NEPTUNE_3_PLUS
-    #define SOFTVERSION             "1.2.5.1b"
+    #define SOFTVERSION             "1.2.5.1c"
   #elif NEPTUNE_3_MAX
-    #define SOFTVERSION             "1.3.5.1b"
+    #define SOFTVERSION             "1.3.5.1c"
   #endif
 
   #if ENABLED(SDSUPPORT)
