@@ -7365,24 +7365,24 @@
           strcpy(cmdbuf, cmd);
           FilenamesCount = CardRecbuf.recordcount;
 
-          save_dual_x_carriage_mode = dualXPrintingModeStatus;
-          switch(save_dual_x_carriage_mode)
-          {
-            case 1:
-              queue.enqueue_now_P(PSTR("M605 S1"));
-              break;
-            case 2:
-              queue.enqueue_now_P(PSTR("M605 S2"));
-              break;
-            case 3:
-              queue.enqueue_now_P(PSTR("M605 S2 X68 R0"));
-              queue.enqueue_now_P(PSTR("M605 S3"));
-              break;
-            default:
-              queue.enqueue_now_P(PSTR("M605 S0"));
-              queue.enqueue_now_P(PSTR("T0"));
-              break;
-          }
+          // save_dual_x_carriage_mode = dualXPrintingModeStatus;
+          // switch(save_dual_x_carriage_mode)
+          // {
+          //   case 1:
+          //     queue.enqueue_now_P(PSTR("M605 S1"));
+          //     break;
+          //   case 2:
+          //     queue.enqueue_now_P(PSTR("M605 S2"));
+          //     break;
+          //   case 3:
+          //     queue.enqueue_now_P(PSTR("M605 S2 X68 R0"));
+          //     queue.enqueue_now_P(PSTR("M605 S3"));
+          //     break;
+          //   default:
+          //     queue.enqueue_now_P(PSTR("M605 S0"));
+          //     queue.enqueue_now_P(PSTR("T0"));
+          //     break;
+          // }
 
           if(enable_filment_check)
           {
