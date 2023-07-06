@@ -765,6 +765,16 @@ void MarlinSettings::postprocess() {
    * M500 - Store Configuration
    */
   bool MarlinSettings::save() {
+
+
+
+
+
+    planner.synchronize();
+
+
+
+
     float dummyf = 0;
     char ver[4] = "ERR";
 
@@ -1693,6 +1703,15 @@ void MarlinSettings::postprocess() {
     }
 
     TERN_(EXTENSIBLE_UI, ExtUI::onSettingsStored(!eeprom_error));
+    //
+    //
+    //
+    planner.synchronize();
+    //
+    //
+    //
+
+
 
     return !eeprom_error;
   }

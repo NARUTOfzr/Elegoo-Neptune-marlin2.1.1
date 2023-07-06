@@ -93,8 +93,8 @@
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_MKS_E3D_V2
   #if ENABLED(RTS_AVAILABLE)
-    //#define NEPTUNE_3_PRO      1
-    #define NEPTUNE_3_PLUS   1
+    #define NEPTUNE_3_PRO      1
+    //#define NEPTUNE_3_PLUS   1
     //#define NEPTUNE_3_MAX    1
     #endif
 #endif
@@ -122,7 +122,7 @@
  */
 #define BAUDRATE 115200
 
-//#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate
+#define BAUD_RATE_GCODE     // Enable G-code M575 to set the baud rate
 
 /**
  * Select a secondary serial port on the board to use for communication with the host.

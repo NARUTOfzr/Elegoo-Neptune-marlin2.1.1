@@ -74,7 +74,7 @@ void MKS_reset_settings() {
   };
   mks_language_index = MKS_SimpleChinese;
   COPY(mks_corner_offsets, init_dgus_level_offsets);
-  mks_park_pos.set(-5, 0, 5);//999-----
+  mks_park_pos.set(0, 0, 5);//999-----
   mks_min_extrusion_temp = 0;
 }
 
@@ -101,7 +101,7 @@ void MKS_pause_print_move() {
     destination.z = _MIN(current_position.z + mks_park_pos.z, Z_MAX_POS);
     prepare_internal_move_to_destination(park_speed_z);
 
-    destination.set(X_MIN_POS + mks_park_pos.x, Y_MIN_POS + mks_park_pos.y);
+    destination.set(X_MIN_POS + 3, Y_MAX_POS - 10);
     prepare_internal_move_to_destination(park_speed_xy);
 
     #if ENABLED(RTS_AVAILABLE)

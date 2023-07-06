@@ -1501,7 +1501,7 @@
 
   //#define MEDIA_MENU_AT_TOP               // Force the media menu to be listed on the top of the main menu
 
-  #define EVENT_GCODE_SD_ABORT "G28XY"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
+  #define EVENT_GCODE_SD_ABORT     "G91\nG1 Z2 F300\nG90"    //"G28XY"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
 
   #if NEPTUNE_3_PRO
     #define EVENT_GCODE_SD_ABORT_2 "G1 F3000 X0 Y230"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")

@@ -391,7 +391,7 @@ void PrintJobRecovery::resume() {
   // Heat hotend enough to soften material
   #if HAS_HOTEND
     HOTEND_LOOP() {
-      const celsius_t et = _MAX(info.target_temperature[e], 180);
+      const celsius_t et = _MAX(info.target_temperature[e], 0);//9999---测试
       if (et) {
         #if HAS_MULTI_HOTEND
           sprintf_P(cmd, PSTR("T%iS"), e);

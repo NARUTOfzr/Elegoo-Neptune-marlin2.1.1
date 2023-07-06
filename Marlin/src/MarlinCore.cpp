@@ -397,6 +397,8 @@ void startOrResumeJob() {
           queue.inject(F(EVENT_GCODE_SD_ABORT));
         #endif
       }
+      queue.enqueue_now_P(PSTR("M900 K0"));
+      queue.enqueue_now_P(PSTR("M500"));
       queue.enqueue_now_P(PSTR("M84"));
       TERN_(PASSWORD_AFTER_SD_PRINT_ABORT, password.lock_machine());
     #else
