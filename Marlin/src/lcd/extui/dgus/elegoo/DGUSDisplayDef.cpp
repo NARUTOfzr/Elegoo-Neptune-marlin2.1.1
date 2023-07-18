@@ -2029,15 +2029,15 @@
   }
 
 
-  void RTSUpdate()
+  void RTSUpdate()//9999----打印进程-断料检测
   {
     static bool start_update;
     static bool first_check = true;
     static uint32_t update_time;
     
-    rtscheck.RTS_SDCardUpate(); // Check the status of card
+    //rtscheck.RTS_SDCardUpate(); // Check the status of card
 
-    if( (enable_filment_check || RTS_M600_Flag)  && IS_SD_PRINTING())
+    if( (enable_filment_check || RTS_M600_Flag)/*  && IS_SD_PRINTING()*/)
     {
       #if ENABLED(CHECKFILEMENT)
          
@@ -2045,45 +2045,9 @@
         opos = npos;
         npos = planner.get_axis_position_mm(E_AXIS);
         
-        if((true == card.isPrinting()) && (true == PoweroffContinue) && (opos!=npos))
+        //if((true == card.isPrinting()) && (true == PoweroffContinue)/* && (opos!=npos)*/)
+        if (/* !printingIsPaused() && */ printJobOngoing()&&(opos!=npos))  
         {
-          #if ENABLED(DUAL_X_CARRIAGE)
-            if((0 == save_dual_x_carriage_mode) && (0 == READ(CHECKFILEMENT0_PIN)) && (active_extruder == 0))
-            {
-              Checkfilenum ++;
-              delay(5);
-            }
-            else if((0 == save_dual_x_carriage_mode) && (0 == READ(CHECKFILEMENT1_PIN)) && (active_extruder == 1))
-            {
-              Checkfilenum ++;
-              delay(5);
-            }
-            else if((0 != save_dual_x_carriage_mode) && ((0 == READ(CHECKFILEMENT0_PIN)) || (0 == READ(CHECKFILEMENT1_PIN))))
-            {
-              Checkfilenum ++;
-              delay(5);
-            }
-            else
-            {
-              delay(5);
-              if((0 == save_dual_x_carriage_mode) && (0 == READ(CHECKFILEMENT0_PIN)) && (active_extruder == 0))
-              {
-                Checkfilenum ++;
-              }
-              else if((0 == save_dual_x_carriage_mode) && (0 == READ(CHECKFILEMENT1_PIN)) && (active_extruder == 1))
-              {
-                Checkfilenum ++;
-              }
-              else if((0 != save_dual_x_carriage_mode) && ((0 == READ(CHECKFILEMENT0_PIN)) || (0 == READ(CHECKFILEMENT1_PIN))))
-              {
-                Checkfilenum ++;
-              }
-              else
-              {
-                Checkfilenum = 0;
-              }
-            }
-          #else
             {
               if( (0 == READ(CHECKFILEMENT0_PIN)) ||  RTS_M600_Flag)
               {
@@ -2095,89 +2059,19 @@
                 Checkfilenum = 0;
               }
             }
-          #endif
 
           if(Checkfilenum > 10)
           {
-            //pause_z = current_position[Z_AXIS];
-            //pause_e = current_position[E_AXIS];
-
-            #if ENABLED(DUAL_X_CARRIAGE)
-              if((0 == save_dual_x_carriage_mode) && (thermalManager.temp_hotend[0].celsius <= (thermalManager.temp_hotend[0].target - 5)))
-              {
-                rtscheck.RTS_SndData(ExchangePageBase + 39, ExchangepageAddr);
-                card.pauseSDPrint();
-                print_job_timer.pause();
-
-                pause_action_flag = true;
-                Checkfilenum = 0;
-                Update_Time_Value = 0;
-                sdcard_pause_check = false;
-                print_preheat_check = true;
-              }
-              else if((0 != save_dual_x_carriage_mode) && ((thermalManager.temp_hotend[0].celsius <= (thermalManager.temp_hotend[0].target - 5)) || (thermalManager.temp_hotend[1].celsius <= (thermalManager.temp_hotend[1].target - 5))))
-              {
-                rtscheck.RTS_SndData(ExchangePageBase + 39, ExchangepageAddr);
-                card.pauseSDPrint();
-                print_job_timer.pause();
-
-                pause_action_flag = true;
-                Checkfilenum = 0;
-                Update_Time_Value = 0;
-                sdcard_pause_check = false;
-                print_preheat_check = true;
-              }
-              else if(thermalManager.temp_bed.celsius <= thermalManager.temp_bed.target)
-              {
-                rtscheck.RTS_SndData(ExchangePageBase + 39, ExchangepageAddr);
-                card.pauseSDPrint();
-                print_job_timer.pause();
-
-                pause_action_flag = true;
-                Checkfilenum = 0;
-                Update_Time_Value = 0;
-                sdcard_pause_check = false;
-                print_preheat_check = true;
-              }
-              else if((!TEST(axis_known_position, X_AXIS)) || (!TEST(axis_known_position, Y_AXIS)) || (!TEST(axis_known_position, Z_AXIS)))
-              {
-                rtscheck.RTS_SndData(ExchangePageBase + 39, ExchangepageAddr);
-                card.pauseSDPrint();
-                print_job_timer.pause();
-
-                pause_action_flag = true;
-                Checkfilenum = 0;
-                Update_Time_Value = 0;
-                sdcard_pause_check = false;
-                print_preheat_check = true;
-              }
-              else
-              {
-                rtscheck.RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
-                #if ENABLED(TJC_AVAILABLE) 
-                  LCD_SERIAL_2.printf("page wait");
-                  LCD_SERIAL_2.printf("\xff\xff\xff");               
-                #endif
-                waitway = 5;
-
-                #if ENABLED(POWER_LOSS_RECOVERY)
-                  if (recovery.enabled)
-                  {
-                    recovery.save(true, false);
-                  }
-                #endif
-                card.pauseSDPrint();
-                print_job_timer.pause();
-
-                pause_action_flag = true;
-                Checkfilenum = 0;
-                Update_Time_Value = 0;
-                planner.synchronize();
-                sdcard_pause_check = false;
-              }
-            #else
               {
                 waitway = 5;
+                if (false == card.isPrinting())
+
+                {
+                    queue.enqueue_now_P(PSTR("M600"));
+                }
+                
+
+
 
                 #if ENABLED(RTS_AVAILABLE)
                   rtscheck.RTS_SndData(ExchangePageBase + 40, ExchangepageAddr);
@@ -2186,16 +2080,6 @@
                   LCD_SERIAL_2.printf("\xff\xff\xff");               
                   #endif
                 #endif
-
-                // #if ENABLED(POWER_LOSS_RECOVERY)
-                //   if (recovery.enabled)
-                //   {
-                //     recovery.save(true, false);
-                //   }
-                // #endif
-
-                // card.pauseSDPrint();
-                // print_job_timer.pause();
 
                 ExtUI::pausePrint();
 
@@ -2206,7 +2090,6 @@
 
                 planner.synchronize();              
               }
-            #endif
           }
         }
       
@@ -2984,8 +2867,16 @@
       }
       break;
 
-      case PausePrintKey:
+      case PausePrintKey://暂停打印按钮
       {
+        //if (/* !printingIsPaused() && */ printJobOngoing()&&(opos!=npos))
+
+
+
+
+
+
+
         if(recdat.data[0] == 0xF0)
         {
           break;
@@ -3029,10 +2920,20 @@
           }
         }
       }
+
+
+
+
+      
       break;
 
-      case ResumePrintKey:
+      case ResumePrintKey://恢复打印按钮
       {
+        if (printingIsPaused()) 
+        {
+          //startOrResumeJob();
+          queue.enqueue_now_P(PSTR("M24"));
+        }
             //const float olde = current_position.e;
             //pause_e = current_position[E_AXIS];
             //const float olde = current_position[E_AXIS];
@@ -6660,25 +6561,6 @@
       {
         if (recdat.data[0] == 1)
         {
-          #if ENABLED(DUAL_X_CARRIAGE)
-            save_dual_x_carriage_mode = dualXPrintingModeStatus;
-            switch(save_dual_x_carriage_mode)
-            {
-              case 1:
-                queue.enqueue_now_P(PSTR("M605 S1"));
-                break;
-              case 2:
-                queue.enqueue_now_P(PSTR("M605 S2"));
-                break;
-              case 3:
-                queue.enqueue_now_P(PSTR("M605 S2 X68 R0"));
-                queue.enqueue_now_P(PSTR("M605 S3"));
-                break;
-              default:
-                queue.enqueue_now_P(PSTR("M605 S0"));
-                break;
-            }
-          #endif
 
           #if ENABLED(POWER_LOSS_RECOVERY)
             //if (recovery.info.recovery_flag)
